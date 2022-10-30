@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+  <h1>Verschlüsselung mit der Vigenere Chiffre</h1>
+
+   <nav>
+       <a href="{{url_for('bp_vigenere.verschluesseln_buttonclick')}}" >Verschlüsseln</a>
+       <a href="#">Link 1</a>
+       <a href="#">Link 2</a>
+       <a href="#">Link 3</a>
+       <a href="#">Link 4</a>
+   </nav>
+
+  <form action="{{url_for('bp_vigenere.verschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
+    <label for="key">Eingabe des Schlüssels:</label>
+    <input type="text" id="key" name="key" value="{{key_param}}"><br>
+    <br>
+    <label for="cleartext_upload">Upload für den zu verschlüsselnden Text: </label>
+    <input type="file" id="cleartext_upload" name="cleartext_upload" value="{{upload_param}}"><br>
+    <label for="cleartext_text">Alternativ:</label><br>
+    <label for="cleartext_text">Eingabe des zu verschlüsselnden Textes:</label>
+    <input type="text" id="cleartext_text" name="cleartext_text" value="{{text_param}}"><br>
+    <button type="submit">Berechnen</button><br>
+  </form>
+
+  <br>
+
+  <table>
+      <tr>
+          {% for item in keytable %}
+          <th>{{item[0]}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for item in keytable %}
+          <th>{{item[1]}}</th>
+          {% endfor %}
+      </tr>
+  </table>
+
+  <br>
+
+  <table>
+      <tr>
+          {% for item in encrypttable %}
+          <th>{{item[0]}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for item in encrypttable %}
+          <th>{{item[1]}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for item in encrypttable %}
+          <th>{{item[2]}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for item in encrypttable %}
+          <th>{{item[3]}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for item in encrypttable %}
+          <th>{{item[4]}}</th>
+          {% endfor %}
+      </tr>
+  </table>
+
+  <br>
+
+  <h3>
+      {{ciphertext}}
+  </h3>
+
+  <form method="get" action="{{url_for('bp_vigenere.download_file')}}">
+     <button type="submit">Download!</button>
+  </form>
+
+</body>
+</html>
+
+
+
+
