@@ -1,5 +1,3 @@
-import numpy as np
-
 
 def encrypt_tabelle(key, cleartext):
 
@@ -8,21 +6,20 @@ def encrypt_tabelle(key, cleartext):
     keystand = 0
     ciphertext = ""
 
-    #umformen von key
+    # umformen von key
     key = key.lower()
     for i in range(len(key)):
         zahl = ord(key[i]) - 97
-        if zahl < 26 and zahl >= 0:
+        if 26 > zahl >= 0:
             key_list.append([key[i], zahl])
-
 
     cleartext = cleartext.lower()
 
     for index in range(len(cleartext)):
 
-        zeichen =ord(cleartext[index])-97
+        zeichen = ord(cleartext[index]) - 97
 
-        if zeichen < 26 and zeichen >= 0:
+        if 26 > zeichen >= 0:
 
             if keystand >= len(key_list):
                 keystand = 0
@@ -35,10 +32,9 @@ def encrypt_tabelle(key, cleartext):
             keystand += 1
             ciphertext += encryptzeichen
 
-
-    file = open('encrypttext.txt', 'w+')    #w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
+    # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
+    file = open('encrypttext.txt', 'w+')
     file.writelines(ciphertext)
     file.close()
 
     return key_list, encrypt_list, ciphertext
-
