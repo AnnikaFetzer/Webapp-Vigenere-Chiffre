@@ -28,12 +28,13 @@ def encrypt_tabelle(key, cleartext):
 
             keynumber = key_list[keystand][1]
             encryptnummer = (zeichen + keynumber) % 26
-            encryptzeichen = chr(encryptnummer + 97)
+            encryptzeichen = chr(encryptnummer + 65)
 
             encrypt_list.append([cleartext[index], zeichen, keynumber, encryptnummer, encryptzeichen])
             keystand += 1
             ciphertext += encryptzeichen
 
+    #ciphertext = ciphertext.upper()
 
 
     file = open('encrypttext.txt', 'w+')    #w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
