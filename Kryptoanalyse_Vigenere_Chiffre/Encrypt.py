@@ -9,6 +9,7 @@ def encrypt_tabelle(key, cleartext):
     ciphertext = ""
 
     #umformen von key
+    key = key.lower()
     for i in range(len(key)):
         zahl = ord(key[i]) - 97
         if zahl < 26 and zahl >= 0:
