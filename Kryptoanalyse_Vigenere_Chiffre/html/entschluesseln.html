@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vigenere: Verschlüsselung</title>
+    <title>Vigenere: Entschlüsselung</title>
 </head>
 
 <body>
 
-  <h1>Verschlüsselung mit der Vigenere Chiffre</h1>
+  <h1>Entschlüsselung mit der Vigenere Chiffre</h1>
 
    <nav>
        <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
@@ -16,15 +16,15 @@
        <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
    </nav>
 
-  <form action="{{url_for('bp_vigenere.verschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
+  <form action="{{url_for('bp_vigenere.entschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
     <label for="key">Eingabe des Schlüssels:</label>
     <input type="text" id="key" name="key" value="{{key_param}}"><br>
     <br>
-    <label for="cleartext_upload">Upload für den zu verschlüsselnden Text: </label>
-    <input type="file" id="cleartext_upload" name="cleartext_upload" value="{{upload_param}}"><br>
-    <label for="cleartext_text">Alternativ:</label><br>
-    <label for="cleartext_text">Eingabe des zu verschlüsselnden Textes:</label>
-    <input type="text" id="cleartext_text" name="cleartext_text" value="{{text_param}}"><br>
+    <label for="ciphertext_upload">Upload für den zu entschlüsselnden Text: </label>
+    <input type="file" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
+    <label for="cipher_text">Alternativ:</label><br>
+    <label for="cipher_text">Eingabe des zu verschlüsselnden Textes:</label>
+    <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br>
     <button type="submit">Berechnen</button><br>
   </form>
 
@@ -47,27 +47,27 @@
 
   <table>
       <tr>
-          {% for item in encrypttable %}
+          {% for item in decrypttable %}
           <th>{{item[0]}}</th>
           {% endfor %}
       </tr>
       <tr>
-          {% for item in encrypttable %}
+          {% for item in decrypttable %}
           <th>{{item[1]}}</th>
           {% endfor %}
       </tr>
       <tr>
-          {% for item in encrypttable %}
+          {% for item in decrypttable %}
           <th>{{item[2]}}</th>
           {% endfor %}
       </tr>
       <tr>
-          {% for item in encrypttable %}
+          {% for item in decrypttable %}
           <th>{{item[3]}}</th>
           {% endfor %}
       </tr>
       <tr>
-          {% for item in encrypttable %}
+          {% for item in decrypttable %}
           <th>{{item[4]}}</th>
           {% endfor %}
       </tr>
@@ -76,16 +76,12 @@
   <br>
 
   <h3>
-      {{ciphertext}}
+      {{cleartext}}
   </h3>
 
-  <form method="get" action="{{url_for('bp_vigenere.encrypt_download_file')}}">
+  <form method="get" action="{{url_for('bp_vigenere.decrypt_download_file')}}">
      <button type="submit">Download!</button>
   </form>
 
 </body>
 </html>
-
-
-
-

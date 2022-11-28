@@ -1,7 +1,5 @@
-import numpy as np
+
 from flask import Flask
-
-
 
 from blueprints import bp_vigenere
 

@@ -2,18 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Vigenere: Kasiski-Test</title>
 </head>
 
 <body>
 
   <h1>Bestimmen der Schlüssellänge mit dem Kasiski-Test</h1>
 
-   <nav>
-       <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
-       <a href="{{url_for('bp_vigenere.kasiski_test')}}">Kasiski-Test</a>
-       <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
-   </nav>
+  <nav>
+      <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
+      <a href="{{url_for('bp_vigenere.entschluesseln')}}" >Entschlüsseln</a>
+      <a href="{{url_for('bp_vigenere.kasiski_test')}}">Kasiski-Test</a>
+      <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
+  </nav>
+
+  <br>
+
+  <form action="{{url_for('bp_vigenere.kasiski_test')}}" method="post" enctype="multipart/form-data">
+      <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
+      <input type="file" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
+      <label for="cipher_text">Alternativ:</label><br>
+      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label>
+      <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br><br>
+      <label>
+          Zur Berechnung der Schlüssellänge wird wenn vorhanden der Uploadtext verwendet.<br>
+          Ist keine Datei vorhanden wird der eingegebene Text verwendet
+      </label><br><br>
+      <button type="submit">Schlüssellange berechnen</button><br>
+  </form>
 
 
 </body>
