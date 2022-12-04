@@ -5,6 +5,9 @@
     <title>Vigenere: Koinzidenzindex-Methode</title>
 </head>
 
+<script src="{{url_for('bp_vigenere.ci_js_send')}}">
+</script>
+
 <body>
 
   <h1>Bestimmen der Schlüssellänge mit der Koinzidenzindex-Methode</h1>
@@ -16,6 +19,64 @@
        <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
    </nav>
 
+    <br>
+
+  <form action="{{url_for('bp_vigenere.koinzidenzindex_methode_buttonclick')}}" method="post" enctype="multipart/form-data">
+
+      <label for="cols_number">Eingabe bis zu welcher möglichen Schlüssellänge der Text betrachtet werden soll (als positive Ganzzahl): <br></label>
+      <input type="number" id="cols_number" name="cols_number" value="{{cols_param}}"><br><br>
+
+      <label for="threshold">Eingabe des zu beachtenden Schwellwertes: </label>
+      <input type="text" id="threshold" name="threshold" value="{{threshold_param}}"><br><br>
+
+      <p>
+          Auswahl der Texteingabe:
+      </p>
+      <input type="radio" id="text_eingabe" name="eingabe_auswahl">
+      <label for="text_eingabe">Eingabe des verschlüsselten Textes</label><br>
+      <input type="radio" id="datei_upload" name="eingabe_auswahl">
+      <label for="datei_upload">Upload des Textes in txt-Datei</label>
+      <br><br>
+
+      <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
+      <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
+      <label for="cipher_text">Alternativ:</label><br>
+      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label>
+      <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br><br>
+      <button type="submit">Schlüssellange berechnen</button><br>
+  </form>
+
+
+  <table>
+      {% for item in ki_tabelle %}
+      <tr>
+          <th>{{item[0]}}</th>
+          {% for i in item[2] %}
+          <th> {{i}} </th>
+          {% endfor %}
+      </tr>
+      {% endfor %}
+  </table>
+
+
+  <form>
+      <p>Wählen Sie eine genauer zu betrachtende Zeile aus.</p>
+      <p>
+          <label>Zeile:
+              <select name="spalten" size="4">
+                  {% for item in ki_tabelle %}
+                  <option label="{{item[0]}}" onclick="onClickTextaufteilung({{item[0]}}, {{item[1]}}, {{item[2]}})">{{item[0]}}</option>
+                  {% endfor %}
+              </select>
+          </label>
+      </p>
+  </form>
+
+  <table>
+      <tbody id="ci_berechnung">
+
+      </tbody>
+  </table>
 
 </body>
 </html>

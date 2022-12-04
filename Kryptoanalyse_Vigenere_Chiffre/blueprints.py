@@ -127,7 +127,7 @@ def kasiski_test():
 
 @bp_vigenere.route('/kasiski', methods=['POST'])
 def kasiski_test_buttonclick():
-    ng_lenght = request.form.get('ngramm_length')
+    ng_length = request.form.get('ngramm_length')
     texteingabe = request.form.get('cipher_text')
     datei = request.files.get('ciphertext_upload')
     dateiinhalt = datei.read().decode('utf-8')
@@ -136,19 +136,19 @@ def kasiski_test_buttonclick():
     # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
     if dateiinhalt == "" and texteingabe == "":
         texteingabe = "MOIRBMOVOXBUEARWALSPHTIHFAPIFNDXMMNMOIPYXLHWAZZXOEMOICYWTIBZNAXSEXKXVNMPXCZXUHSQBSPPHMKESAXY"
-        kasiski_return = kasiski(texteingabe, int(ng_lenght))
+        kasiski_return = kasiski(texteingabe, int(ng_length))
     # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
     elif dateiinhalt == "":
-        kasiski_return = kasiski(texteingabe, int(ng_lenght))
+        kasiski_return = kasiski(texteingabe, int(ng_length))
     # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
     else:
-        kasiski_return = kasiski(dateiinhalt, int(ng_lenght))
+        kasiski_return = kasiski(dateiinhalt, int(ng_length))
         texteingabe = dateiinhalt
 
     return render_template('kasiski-test.html',
                            ngramme=kasiski_return[0],
                            gcd=kasiski_return[1],
-                           ngramm_param=ng_lenght,
+                           ngramm_param=ng_length,
                            text_param=texteingabe)
 
 
@@ -160,8 +160,46 @@ def kasiski_js_send():
 # ----------------------------------------------------------------------------------------------------------------------
 # Koinzidenzindex
 # ----------------------------------------------------------------------------------------------------------------------
-@bp_vigenere.route('koinzidenzindex', methods=['GET'])
+@bp_vigenere.route('/koinzidenzindex', methods=['GET'])
 def koinzidenzindex_methode():
     test = "UHDJVMBBNFBUKOSYZTFUACBQMIOAUECIFZBCTHANTANEQQPGNTISKBSCSEZBRJBZCGCPQLPRQMNTDCIKTCXAEYAWGNOGWGWZYESVOO"
     coincidence_berechnung(test, int(4), float(0.65))
     return render_template('koinzidenzindex-methode.html')
+
+
+@bp_vigenere.route('/koinzidenzindex', methods=['POST'])
+def koinzidenzindex_methode_buttonclick():
+    max_cols = request.form.get('cols_number')
+    threshold = request.form.get('threshold')
+    texteingabe = request.form.get('cipher_text')
+    datei = request.files.get('ciphertext_upload')
+    dateiinhalt = datei.read().decode('utf-8')
+
+    if threshold == "":
+        threshold = "0.6"
+    if max_cols == "":
+        max_cols = 10
+
+    # Todo: abfangen wenn leerer/falscher Eingaben
+    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
+    if dateiinhalt == "" and texteingabe == "":
+        texteingabe = "MOIRBMOVOXBUEARWALSPHTIHFAPIFNDXMMNMOIPYXLHWAZZXOEMOICYWTIBZNAXSEXKXVNMPXCZXUHSQBSPPHMKESAXY"
+        ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
+    # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
+    elif dateiinhalt == "":
+        ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
+    # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
+    else:
+        ci_return = coincidence_berechnung(str(dateiinhalt), int(max_cols), float(threshold))
+        texteingabe = dateiinhalt
+
+    return render_template('koinzidenzindex-methode.html',
+                           cols_param=max_cols,
+                           threshold_param=threshold,
+                           text_param=texteingabe,
+                           ki_tabelle=ci_return)
+
+
+@bp_vigenere.route('/ci_js_send', methods=['GET'])
+def ci_js_send():
+    return send_file('ki_spaltenaufteilung.js')

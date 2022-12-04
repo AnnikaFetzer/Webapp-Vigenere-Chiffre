@@ -194,7 +194,7 @@ def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
         if c_indexe[k] <= schwellwert:
             result = False
 
-    return spalten, c_indexe, result
+    return len(spalten), spalten, c_indexe, result
 
 
 def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float):
@@ -204,12 +204,14 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
     :param schwellwert:
     :return:
     """
+    # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
+    ciphertext = textanpassung(ciphertext)
 
     k_indizes = []
 
     for i in range(max_spalten):
-        test = coincidence_test(ciphertext, i+1, schwellwert)
-        k_indizes.append(test)
+        k_indizes.append(coincidence_test(ciphertext, i+1, schwellwert))
 
     return k_indizes
 
