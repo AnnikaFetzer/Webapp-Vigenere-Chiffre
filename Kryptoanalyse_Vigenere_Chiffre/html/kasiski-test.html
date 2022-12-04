@@ -5,7 +5,12 @@
     <title>Vigenere: Kasiski-Test</title>
 </head>
 
+<script src="{{url_for('bp_vigenere.kasiski_js_send')}}">
+</script>
+
+
 <body>
+    <!-- das ist ein kommentar -->
 
   <h1>Bestimmen der Schlüssellänge mit dem Kasiski-Test</h1>
 
@@ -18,9 +23,11 @@
 
   <br>
 
-  <form action="{{url_for('bp_vigenere.kasiski_test')}}" method="post" enctype="multipart/form-data">
+  <form action="{{url_for('bp_vigenere.kasiski_test_buttonclick')}}" method="post" enctype="multipart/form-data">
+      <label for="ngramm_length">Eingabe der Länge der zu bearbeitenden n-grammme (als positive Ganzzahl):</label>
+      <input type="number" id="ngramm_length" name="ngramm_length" value="{{ngramm_param}}"><br><br>
       <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
-      <input type="file" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
+      <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
       <label for="cipher_text">Alternativ:</label><br>
       <label for="cipher_text">Eingabe des verschlüsselten Textes:</label>
       <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br><br>
@@ -31,6 +38,27 @@
       <button type="submit">Schlüssellange berechnen</button><br>
   </form>
 
+  <form>
+      <p>Wählen Sie zu betrachtendes n-gramm aus.</p>
+      <p>
+          <label>n-gramm:
+              <select name="ngramme" size="4">
+                  {% for item in ngramme %}
+                  <option label="{{item[0]}}" onclick="onClickNgramm('{{item[0]}}', {{item[1]}}, {{item[2]}})">{{item[0]}}</option>
+                  {% endfor %}
+              </select>
+          </label>
+      </p>
+      <p>
+          Berechnete Schlüssellänge (häufigster gcd der ermittelten n-gramme): {{gcd}}
+      </p>
+  </form>
+
+  <div id="ausgabe_positionen">
+  </div>
+
+  <div id="ausgabe_text_farbig">
+  </div>
 
 </body>
 </html>

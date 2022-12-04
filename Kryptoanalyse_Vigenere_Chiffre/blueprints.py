@@ -2,6 +2,7 @@
 
 from Encrypt import encrypt_tabelle
 from VigenereChiffre import decrypt_tabelle
+from VigenereChiffre import kasiski, coincidence_berechnung
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file
 # from matplotlib.backends.backend_template import FigureCanvas
@@ -38,7 +39,7 @@ def verschluesseln_buttonclick():
     schluesseleingabe = request.form.get('key').strip()
     datei = request.files['cleartext_upload']
 
-    # macht keine exception wenn datei nicht existiert (gibt dann None zurück)
+    # macht keine exception, wenn datei nicht existiert (gibt dann None zurück)
     # request.files.get('cleartext_upload526126')
 
     # variante 1
@@ -111,21 +112,56 @@ def entschluesseln_buttonclick():
 
 @bp_vigenere.route('/decrypt_download', methods=['GET'])
 def decrypt_download_file():
-    # todo: parallellnutzung (andere Lösung, atomatischer Download bei berechnung, neues berechnen von ciphertext hier?
+    # todo: parallellnutzung (andere Lösung, automatischer Download bei berechnung, neues berechnen von ciphertext hier?
     return send_file('decrypttext.txt', as_attachment=True)
 
-# ----------------------------------------------------------------------------------------------------------------------
-#
-# ----------------------------------------------------------------------------------------------------------------------
 
-
-@bp_vigenere.route('kasiski', methods=['GET'])
+# ----------------------------------------------------------------------------------------------------------------------
+# Kasiski-Test
+# ----------------------------------------------------------------------------------------------------------------------
+@bp_vigenere.route('/kasiski', methods=['GET'])
 def kasiski_test():
-    # texteingabe = request.form.get('cipher_text')
-    # datei = request.files.get('ciphertext_upload')
+    # todo
     return render_template('kasiski-test.html')
 
 
+@bp_vigenere.route('/kasiski', methods=['POST'])
+def kasiski_test_buttonclick():
+    ng_lenght = request.form.get('ngramm_length')
+    texteingabe = request.form.get('cipher_text')
+    datei = request.files.get('ciphertext_upload')
+    dateiinhalt = datei.read().decode('utf-8')
+
+    # Todo: abfangen wenn keine/falsche Eingabe der n-gramm-Länge erfolgt ist
+    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
+    if dateiinhalt == "" and texteingabe == "":
+        texteingabe = "MOIRBMOVOXBUEARWALSPHTIHFAPIFNDXMMNMOIPYXLHWAZZXOEMOICYWTIBZNAXSEXKXVNMPXCZXUHSQBSPPHMKESAXY"
+        kasiski_return = kasiski(texteingabe, int(ng_lenght))
+    # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
+    elif dateiinhalt == "":
+        kasiski_return = kasiski(texteingabe, int(ng_lenght))
+    # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
+    else:
+        kasiski_return = kasiski(dateiinhalt, int(ng_lenght))
+        texteingabe = dateiinhalt
+
+    return render_template('kasiski-test.html',
+                           ngramme=kasiski_return[0],
+                           gcd=kasiski_return[1],
+                           ngramm_param=ng_lenght,
+                           text_param=texteingabe)
+
+
+@bp_vigenere.route('/kasiski_js_send', methods=['GET'])
+def kasiski_js_send():
+    return send_file('kasiski.js')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Koinzidenzindex
+# ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('koinzidenzindex', methods=['GET'])
 def koinzidenzindex_methode():
+    test = "UHDJVMBBNFBUKOSYZTFUACBQMIOAUECIFZBCTHANTANEQQPGNTISKBSCSEZBRJBZCGCPQLPRQMNTDCIKTCXAEYAWGNOGWGWZYESVOO"
+    coincidence_berechnung(test, int(4), float(0.65))
     return render_template('koinzidenzindex-methode.html')

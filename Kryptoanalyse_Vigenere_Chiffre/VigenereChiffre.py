@@ -40,9 +40,10 @@ def decrypt_tabelle(key, ciphertext):
     return key_list, decrypt_list, cleartext
 
 
-def kasiski(ciphertext, ngramm_laenge):
+def kasiski(ciphertext: str, ngramm_laenge: int):
 
     # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
     ciphertext = textanpassung(ciphertext)
 
     # Dictionary, welche die n-gramme enthält
@@ -59,7 +60,7 @@ def kasiski(ciphertext, ngramm_laenge):
 
         # wenn betrachteter substring schon vorgekommen ist:
         if substring in ngramme.keys():
-           ngramme[substring].append(n)
+            ngramme[substring].append(n)
 
         # ansonsten wird er neu hinzugefügt
         else:
@@ -81,7 +82,7 @@ def kasiski(ciphertext, ngramm_laenge):
                 abstaende.append(value[m+1] - value[0])
 
             ggt = gcd_berechnung(abstaende)
-            relevante_ng = ([key, ngramme[key], ggt])
+            relevante_ng.append([key, ngramme[key], ggt])
 
             """
             Hinzufügen des berechneten ggT's in das Dictionary gcds 
@@ -109,7 +110,13 @@ def textanpassung(ciphertext):
     # todo ciphertext (in String mit Großbuchstaben) konvertieren
     # todo: zudem Fehler ausschließen
 
-    return ciphertext
+    ciphertext.upper()
+    n_ct = ""
+    for i in range(len(ciphertext)):
+        if 65 <= ord(ciphertext[i]) <= 90:
+            n_ct += ciphertext[i]
+
+    return n_ct
 
 
 def gcd_berechnung(abstaende):
@@ -126,13 +133,109 @@ def gcd(a, b):
         r = a % b
         a = b
         b = r
-        if r is 0:
+        if r == 0:
             break
     return a
 
-# def koinzidenzindex(ciphertext, spalten, threschold):
 
-    # for i in range(26):
-#
-    # k_index = 0
-    # return k_index
+def coincidence_index(text):
+    """
+    Berechnet den Koinzidenzindex des übergebenen Textes
+    :param text: zu analysierender verschlüsselter Text
+    :return: berechneter Koinzidenzindex als Fließkommazahl
+    """
+
+    # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
+    text = textanpassung(text)
+
+    # Berechnung des Koinzidenzindexes
+    c_index = 0
+    for i in range(26):
+        anzahl = text.count(chr(i + 65))
+        c_index = c_index + anzahl * (anzahl-1)
+    c_index = c_index / (len(text) * (len(text) - 1))
+
+    return c_index
+
+
+def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
+    """
+    :param ciphertext:
+    :param spaltenanzahl:
+    :param schwellwert:
+    :return:
+    """
+
+    # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
+    spalten = []
+    if spaltenanzahl > 1:
+        for i in range(spaltenanzahl):
+            spalten.append(ciphertext[i])
+        s = 0
+        for j in range(spaltenanzahl, len(ciphertext)):
+            spalten[s] = str(spalten[s] + ciphertext[j])
+            s += 1
+            if s > spaltenanzahl - 1:
+                s = 0
+    # wenn nur eine Spalte gegeben ist vereinfachte Lösung, da kein Aufteilen von ciphertext nötig ist.
+    else:
+        spalten.append(ciphertext)
+
+    """
+    Berechnung der Koinzidenzindexe der entstandenen Texte in spalten.
+    Da zudem überprüft wird, ob alle berechneten Indexe der Spaltentexte über dem gegebenen Schwellwert liegen,
+    wird result auf False gesetzt wenn ein Koinzidenzindex kleiner-gleich dem Schwellwert ist.
+    """
+    c_indexe = []
+    result = True
+    for k in range(len(spalten)):
+        c_indexe.append(coincidence_index(spalten[k]))
+        if c_indexe[k] <= schwellwert:
+            result = False
+
+    return spalten, c_indexe, result
+
+
+def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float):
+    """
+    :param ciphertext:
+    :param max_spalten:
+    :param schwellwert:
+    :return:
+    """
+
+    k_indizes = []
+
+    for i in range(max_spalten):
+        test = coincidence_test(ciphertext, i+1, schwellwert)
+        k_indizes.append(test)
+
+    return k_indizes
+
+
+# def mutual_coincidence_index(ciphertext: str, cols: int, col_i: int, col_j: int, threshold: float):
+def mutual_coincidence_index(text_x: str, text_y: str):
+    mic = 0
+    for i in range(26):
+        mic = mic + text_x.count(chr(i+65)) * text_y.count(chr(i+65))
+    mic = mic / (len(text_x) * len(text_y))
+
+    return mic
+
+
+def max_mci(text_x: str, text_y: str):
+
+    # todo: mci
+    #  - Spalten/Texte befüllen (text_x und text_y)
+    #  - ermitteln welcher mci mit Verschiebung der Maximale ist + ermittlung aller mcis mit verschiebung
+    #  - Tabelle befüllen, x/i == y/j  -> 0 || mci < schwellwert -> -1
+    return
+
+
+
+
+
+
+
+
