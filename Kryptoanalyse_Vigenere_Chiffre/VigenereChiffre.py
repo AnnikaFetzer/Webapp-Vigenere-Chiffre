@@ -218,26 +218,122 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
 
 # def mutual_coincidence_index(ciphertext: str, cols: int, col_i: int, col_j: int, threshold: float):
 def mutual_coincidence_index(text_x: str, text_y: str):
-    mic = 0
-    for i in range(26):
-        mic = mic + text_x.count(chr(i+65)) * text_y.count(chr(i+65))
-    mic = mic / (len(text_x) * len(text_y))
+    """
+    Berechnet den gegenseitigen Koinzidenzindex der zwei übergebenen Texte für jede Verschiebung von text_y.
+    Dabei wird der maximale Koinzidenzindex mit dessen Verschiebung ermittelt
+    :param text_x:
+    :param text_y:
+    :return: alle berechneten gegenseitige Koinzidenzindexe sowie der größte berechnete MIc mit dessen Verschiebung
+    """
 
-    return mic
+    mics = []
+    max_mic = -1
+    g_maxmic = -1
+
+    # Berechnung aller MIc's mit allen um g verschobenen Varianten von text_y
+    for g in range(26):
+
+        # Berechnen des gegenseitigen Koinzidenzindexes der beiden gegebenen Texte mit der Verschiebung g
+        mic = 0
+        for i in range(26):
+            ig = (i - g) % 26
+            mic = mic + text_x.count(chr(i + 65)) * text_y.count(chr(ig + 65))
+        mic = mic / (len(text_x) * len(text_y))
+
+        # anfügen des berechneten MIc mit der verwendeten Verschiebung g in mics
+        mics.append([g, mic])
+
+        # Ermittlung, ob der aktuelle MIc der bisher Maximale ist.
+        # Wenn ja, wird dieser mit zugehörigen g gespeichert.
+        if mic > max_mic:
+            max_mic = mic
+            g_maxmic = g
+
+    return mics, max_mic, g_maxmic
 
 
-def max_mci(text_x: str, text_y: str):
+def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
+    """
+    :param texteingabe:
+    :param texte:
+    :param cols:
+    :param schwellwert:
+    :return:
+    """
+    matrix = []
+    alle_mcis = []
 
-    # todo: mci
-    #  - Spalten/Texte befüllen (text_x und text_y)
-    #  - ermitteln welcher mci mit Verschiebung der Maximale ist + ermittlung aller mcis mit verschiebung
-    #  - Tabelle befüllen, x/i == y/j  -> 0 || mci < schwellwert -> -1
-    return
+    # Befüllen der Matrix zur Schlüsselberechnung
+    for j in range(cols):
+        zeile = []
+        gueltiger_key = True
+        for i in range(cols):
+            # sind i und j identisch kommt an dieser Stelle eine 0 in die Matrix
+            if i == j:
+                zeile.append(0)
+            # sind i und j unterschiedlich werden die gegenseitige Koinzidenzindexe mit allen Verschiebungen berechnet
+            else:
+                mci = mutual_coincidence_index(texte[i], texte[j])
+                """
+                ist der höchste MIc größer gleich wie der gegebene Schwellwert 
+                wird die Matrix mit der Verschiebung befüllt
+                """
+                if mci[1] >= schwellwert:
+                    zeile.append(mci[2])
+                # ist der MIc kleiner als der Schwellwert wird in die Matrix eine -1 eingetragen
+                else:
+                    zeile.append(-1)
+                    """ 
+                    Aus einer Zeile der Matrix kann nur der Schlüssel ermittelt werden wenn keine -1 darin vorkommt.
+                    Da dies an dieser Stelle aber der Fall ist, wird gueltiger_key auf False gesetzt.
+                    """
+                    gueltiger_key = False
+
+                alle_mcis.append([i+1, j+1, mci[0], mci[1], mci[2]])
+        matrix.append([zeile, gueltiger_key, j+1])
+
+    # Schlüsselberechnung
+    schluessel = []
+    for reihe in range(cols):
+        # Wenn die aktuelle Zeile keine -1 enthält und somit der mögliche Schlüssel ermittelbar ist
+        if matrix[reihe][1] is True:
+            # werden 26 mögliche Schlüssel ermittelt
+            keys = []
+            for k in range(26):
+                key = ""
+                for spalte in range(cols):
+                    key = key + chr(((k + matrix[reihe][0][spalte]) % 26) + 97)
+
+                # Entschlüsselung des Textanfangs mit erhaltenem Schlüssel
+                cleartext = decrypt_tabelle(key, texteingabe[0:24])
+
+                keys.append([chr(k + 97), key, cleartext])
+            schluessel.append([reihe+1, keys])
+
+    return alle_mcis, matrix, schluessel
 
 
+def textaufteilung(ciphertext: str, spaltenanzahl: int):
+    """
+    :param ciphertext: gegebener ciphertext
+    :param spaltenanzahl: Zahl, welche angibt in wie viele Texte text aufgeteilt werden soll
+    :return: der in spaltenanzahl aufgeteilte Texte aufgeteilte ciphertext
+    """
 
+    # Sicherstellung, dass der gegebene Text den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben
+    ciphertext = textanpassung(ciphertext)
 
+    # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
+    texte = []
+    for i in range(spaltenanzahl):
+        texte.append(ciphertext[i])
+    aktuelle_spalte = 0
 
-
-
-
+    # Iteration beginnend bei Spaltenanzahl
+    for j in range(spaltenanzahl, len(ciphertext)):
+        texte[aktuelle_spalte] = str(texte[aktuelle_spalte] + ciphertext[j])
+        aktuelle_spalte += 1
+        if aktuelle_spalte > spaltenanzahl - 1:
+            aktuelle_spalte = 0
+    return texte

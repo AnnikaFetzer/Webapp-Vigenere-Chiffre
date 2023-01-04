@@ -2,7 +2,7 @@
 
 from Encrypt import encrypt_tabelle
 from VigenereChiffre import decrypt_tabelle
-from VigenereChiffre import kasiski, coincidence_berechnung
+from VigenereChiffre import kasiski, coincidence_berechnung, textaufteilung, mutual_coincidence_index, schluesselberechnung
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file
 # from matplotlib.backends.backend_template import FigureCanvas
@@ -203,3 +203,56 @@ def koinzidenzindex_methode_buttonclick():
 @bp_vigenere.route('/ci_js_send', methods=['GET'])
 def ci_js_send():
     return send_file('ki_spaltenaufteilung.js')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Schlüsselberechnung
+# ----------------------------------------------------------------------------------------------------------------------
+@bp_vigenere.route('/gegenseitigerKoinzidenzindex', methods=['GET'])
+def gki_methode():
+    return render_template('schluesselberechnung.html')
+
+@bp_vigenere.route('/gegenseitigerKoinzidenzindex', methods=['POST'])
+def gki_methode_buttonclick():
+
+    cols = request.form.get('keylength')
+    threshold = request.form.get('schwellwert')
+    texteingabe = request.form.get('cipher_text')
+    datei = request.files.get('ciphertext_upload')
+    dateiinhalt = datei.read().decode('utf-8')
+
+    # Todo: abfangen wenn keine/falsche Eingabe der n-gramm-Länge erfolgt ist
+    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
+
+    if threshold == "":
+        threshold = 0.065
+
+    # todo: was wenn beides leer?
+    if dateiinhalt == "":
+        texte = textaufteilung(texteingabe, int(cols))
+    else:
+        texte = textaufteilung(dateiinhalt, int(cols))
+        texteingabe = dateiinhalt
+
+    texttabelle = []
+    for i in range(int(cols)):
+        texttabelle.append([i+1, texte[i]])
+
+    # mutual_coincidence_index(texte[0], texte[1])
+    sb_return = schluesselberechnung(texteingabe, texte, int(cols), float(threshold))
+
+    return render_template('schluesselberechnung.html',
+                           text_param=texteingabe,
+                           schwellwert_param=threshold,
+                           keylength_param=cols,
+                           cols=int(cols),
+                           texte=texttabelle,
+                           mics=sb_return[0],
+                           matrix=sb_return[1],
+                           schluessel=sb_return[2])
+
+
+@bp_vigenere.route('/schluessel_js_send', methods=['GET'])
+def schluessel_js_send():
+    return send_file('schluessel.js')
+
