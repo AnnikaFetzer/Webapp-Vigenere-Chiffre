@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- ggf. wieder löschen: Grafiktest -->
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <title>Vigenere: Schlüsselberechnung</title>
     <style>
         table,th,td{border:1px solid #cccccc}
@@ -53,31 +59,35 @@
       {% endfor %}
   </table><br>
 
-
   <!-- Grafikspaltenauswahl -->
   <form>
       <p>Wählen Sie 2 Texte zur Grafischen Darstellung des gegenseitigen Koinzidenzindexes.</p>
       <p>
           <label>Text 1:
-              <select name="text1" size="3">
+              <select id="text1" name="text1" size="3">
                   {% for item in texte %}
                   <option label="{{item[0]}}" >{{item[0]}}</option>
                   {% endfor %}
               </select>
           </label>
           <label>Text 2:
-              <select name="keys" size="3">
+              <select id="text2" name="text2" size="3">
                   {% for item in texte %}
                   <option label="{{item[0]}}" >{{item[0]}}</option>
                   {% endfor %}
               </select>
           </label>
-
       </p>
   </form>
 
 
-
+  <!-- Bild laden -->
+  <button id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte }})">Grafik berechnen</button>
+  <div>
+      <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1={{text_param}}&text2=lala2&shift=0" alt="Matplot Image">
+  </div>
+  <button id="button_zurueck" name="button_zurueck" onclick="lastBild()">vorherige Grafik</button>
+  <button id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik</button>
 
 
   <!-- MIc's mit den allen Verschiebungen -->
@@ -168,9 +178,6 @@
       <tbody id="schluessel_berechnung">
       </tbody>
   </table>
-
-
-
 
 
 </body>

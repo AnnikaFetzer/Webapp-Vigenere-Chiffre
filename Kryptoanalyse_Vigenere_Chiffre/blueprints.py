@@ -1,8 +1,9 @@
-
+import time
 
 from Encrypt import encrypt_tabelle
 from VigenereChiffre import decrypt_tabelle
-from VigenereChiffre import kasiski, coincidence_berechnung, textaufteilung, mutual_coincidence_index, schluesselberechnung
+from VigenereChiffre import kasiski, coincidence_berechnung, textaufteilung, schluesselberechnung
+from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file
 # from matplotlib.backends.backend_template import FigureCanvas
@@ -212,6 +213,7 @@ def ci_js_send():
 def gki_methode():
     return render_template('schluesselberechnung.html')
 
+
 @bp_vigenere.route('/gegenseitigerKoinzidenzindex', methods=['POST'])
 def gki_methode_buttonclick():
 
@@ -239,8 +241,10 @@ def gki_methode_buttonclick():
         texttabelle.append([i+1, texte[i]])
 
     # mutual_coincidence_index(texte[0], texte[1])
+    s = time.time()
     sb_return = schluesselberechnung(texteingabe, texte, int(cols), float(threshold))
-
+    e = time.time()
+    diff = e - s
     return render_template('schluesselberechnung.html',
                            text_param=texteingabe,
                            schwellwert_param=threshold,
@@ -255,4 +259,20 @@ def gki_methode_buttonclick():
 @bp_vigenere.route('/schluessel_js_send', methods=['GET'])
 def schluessel_js_send():
     return send_file('schluessel.js')
+
+
+
+
+
+@bp_vigenere.route('/matplotimage', methods=['GET'])
+def matplotimage():
+    test = request.args
+    text1 = request.args.get("text1")
+    text2 = request.args.get("text2")
+    shift = request.args.get("shift")
+
+    fname = create_diagram(text1, text2, int(shift))
+
+    return send_file(fname)
+
 

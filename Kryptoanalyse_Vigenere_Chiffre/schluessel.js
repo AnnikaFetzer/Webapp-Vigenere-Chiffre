@@ -21,41 +21,45 @@ function onClickSchluessel(k, schluessel){
         htmlCode += "<td>" + schluessel[index][1][n][2] + "..." + "</td></tr>"
     }
     ausgabe_table.innerHTML = htmlCode
+}
 
 
+function bildNeuLaden(texte) {
+    let text1_nummer = document.getElementById("text1").selectedIndex
+    let text2_nummer = document.getElementById("text2").selectedIndex
 
-
-
-
-
-/*
-    let zeilenspeicher = ""
-
-    // Befüllen der ersten Zeile mit den Spaltennummern
-    zeilenspeicher = "<tr>"
-    for(i=1; i <= spaltenanzahl; i++){
-        zeilenspeicher += "<th>" + i + "</th>"
+    if (text1_nummer == -1 || text2_nummer == -1) {
+        // Abbruch, da nichts ausgewählt
+        return
     }
-    zeilenspeicher += "</tr>"
+    let text1 = texte[text1_nummer][1]
+    let text2 = texte[text2_nummer][1]
 
-    // Befüllen der zweiten Spalte mit dem berechneten Koinzidenzindex der Spalte
-    zeilenspeicher += "<tr>"
-    for(j=0; j < koinzidenzindexe.length; j++){
-        zeilenspeicher += "<th>" + koinzidenzindexe[j] + "</th>"
+    let bildUrl = document.getElementById("diagrammbild").src.split("?")[0]
+    bildUrl += "?text1=" + text1 + "&text2=" + text2 + "&shift=0"
+    document.getElementById("diagrammbild").src = bildUrl
+}
+
+
+function nextBild(){
+    let newUrl = document.getElementById("diagrammbild").src.split("&shift=")[0]
+    let shift = document.getElementById("diagrammbild").src.split("&shift=")[1]
+    shift = parseInt(shift) + 1
+    if(shift >= 26){
+        shift = 0
     }
-    zeilenspeicher += "</tr>"
+    newUrl += "&shift=" + shift
+    document.getElementById("diagrammbild").src = newUrl
+}
 
-    // Befüllen der Spalten mit dem Text
-    k = 0
-    for(k; k < spaltentexte[spaltenanzahl-1].length; k++){
-        zeilenspeicher += "<tr>"
-        for(l=0; l < spaltenanzahl; l++){
-            zeilenspeicher += "<th>" + spaltentexte[l][k] + "</th>"
-        }
-        zeilenspeicher += "</tr>"
+
+function lastBild(){
+    let newUrl = document.getElementById("diagrammbild").src.split("&shift=")[0]
+    let shift = document.getElementById("diagrammbild").src.split("&shift=")[1]
+    shift = parseInt(shift) - 1
+    if(shift < 0){
+        shift = 25
     }
-
-    ausgabe_table.innerHTML = zeilenspeicher
-    */
-
+    newUrl += "&shift=" + shift
+    document.getElementById("diagrammbild").src = newUrl
 }
