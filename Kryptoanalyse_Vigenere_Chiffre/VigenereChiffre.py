@@ -1,35 +1,64 @@
 
 
 def decrypt_tabelle(key, ciphertext):
+    '''
+    decrypt_tabelle entschlüsselt den übergebenen ciphertext mit dem ebenfalls übergebenen Schlüssel.
+    Zudem wird für den Schlüssel zur späteren Veranschaulichung in html eine Liste erstellt,
+    welche die Schlüsselbuchstaben mit deren zur Entschlüsselung verwendeten Zahlenwert enthält.
+    Für denselben Zweck wird auch für die Entschlüsselung eine Liste erstellt. Diese enthält jeweils die
+    Ciphertextbuchstaben, deren Zahlenwert, der angewante Schlüsselwert, das Additionsergebnis der beiden Zahlenwerte
+    sowie den berechneten entschlüsselten Buchstaben
+    :param key: der zur Entschlüsselung verwendete Schlüssel
+    :param ciphertext: der zu entschlüsselnde Text
+    :return: key_list, decrypt_list, cleartext
+    '''
 
+    '''
+    :param decrypt_list: Liste für die Veranschaulichung der Entschlüsselung
+    :param key_list: Liste für die Veranschaulichung des Schlüssels
+    :param keystand: speichert einen Index von key 
+    :param cleartext: enthält den entschlüsselten Text
+    '''
     decrypt_list = []
     key_list = []
     keystand = 0
     cleartext = ""
 
-    # Umformen von key
-    key = key.lower()
+    # Entfernen ungewollter Zeichen in key und vereinheitlichen der Groß- und Kleinschreibung
+    key = textanpassung_lower(key)
+    # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
+    # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
     for i in range(len(key)):
         zahl = ord(key[i]) - 97
-        if 26 > zahl >= 0:
-            key_list.append([key[i], zahl])
+        key_list.append([key[i], zahl])
 
+    # Sicherstellung, dass ciphertext den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
+    ciphertext = textanpassung_upper(ciphertext)
+
+    # Iteration über den bereinigten ciphertext
     for index in range(len(ciphertext)):
 
+        # Umwandlung des betrachteten Buchstabens in eine Zahl (zwischen 0 und 25)
         zeichen = ord(ciphertext[index]) - 65
 
-        if 26 > zeichen >= 0:
+        # enthält den zur Entschlüsselung nötigen Schlüsselbuchstabenwert
+        keynumber = key_list[keystand][1]
 
-            if keystand >= len(key_list):
-                keystand = 0
+        # Berechnung des Wertes, des entschlüsselten Buchstabens
+        decryptnummer = (zeichen - keynumber) % 26
 
-            keynumber = key_list[keystand][1]
-            decryptnummer = (zeichen - keynumber) % 26
-            decryptzeichen = chr(decryptnummer + 97)
+        # Umwandlung des entschlüsselten Buchstabenwertes in den entschlüsselten Buchstaben
+        decryptzeichen = chr(decryptnummer + 97)
 
-            decrypt_list.append([ciphertext[index], zeichen, keynumber, decryptnummer, decryptzeichen])
-            keystand += 1
-            cleartext += decryptzeichen
+        # Hinzufügen des Cipherbuchstabens mit dessen Zahlenwert, den verwendeten Schlüsselbuchstabenwert
+        # und den entschlüsselten Buchstaben (Zahl und Buchstabe) in decrypt_list
+        decrypt_list.append([ciphertext[index], zeichen, keynumber, decryptnummer, decryptzeichen])
+
+        # keystand auf den nächsten Indexwert setzen und hinzufügen des entschlüsselten Buchstabens in cleartext
+        keystand += 1
+        keystand = keystand % len(key_list)
+        cleartext += decryptzeichen
 
     # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
     # dabei wird der entschlüsselte Text in die Datei geschrieben und die Datei im Anschluss geschlossen
@@ -43,8 +72,8 @@ def decrypt_tabelle(key, ciphertext):
 def kasiski(ciphertext: str, ngramm_laenge: int):
 
     # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
-    ciphertext = textanpassung(ciphertext)
+    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
+    ciphertext = textanpassung_upper(ciphertext)
 
     # Dictionary, welche die n-gramme enthält
     ngramme = dict()
@@ -106,15 +135,21 @@ def kasiski(ciphertext: str, ngramm_laenge: int):
     return relevante_ng, h_gcd
 
 
-def textanpassung(ciphertext):
-    # todo ciphertext (in String mit Großbuchstaben) konvertieren
-    # todo: zudem Fehler ausschließen
-
-    ciphertext.upper()
+def textanpassung_upper(ciphertext):
+    ciphertext = ciphertext.upper()
     n_ct = ""
     for i in range(len(ciphertext)):
         if 65 <= ord(ciphertext[i]) <= 90:
             n_ct += ciphertext[i]
+
+    return n_ct
+
+def textanpassung_lower(text):
+    text = text.lower()
+    n_ct = ""
+    for i in range(len(text)):
+        if 97 <= ord(text[i]) <= 122:
+            n_ct += text[i]
 
     return n_ct
 
@@ -147,7 +182,7 @@ def coincidence_index(text):
 
     # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
     # d.h. nur die die 26 Standardbuchstaben großgeschrieben
-    text = textanpassung(text)
+    text = textanpassung_upper(text)
 
     # Berechnung des Koinzidenzindexes
     c_index = 0
@@ -206,7 +241,7 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
     """
     # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
     # d.h. nur die die 26 Standardbuchstaben großgeschrieben
-    ciphertext = textanpassung(ciphertext)
+    ciphertext = textanpassung_upper(ciphertext)
 
     k_indizes = []
 
@@ -322,7 +357,7 @@ def textaufteilung(ciphertext: str, spaltenanzahl: int):
 
     # Sicherstellung, dass der gegebene Text den gewollten Anforderungen entspricht
     # d.h. nur die die 26 Standardbuchstaben
-    ciphertext = textanpassung(ciphertext)
+    ciphertext = textanpassung_upper(ciphertext)
 
     # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
     texte = []
