@@ -1,17 +1,81 @@
+def encrypt_tabelle(key, cleartext):
+    """
+    encrypt_tabelle verschlüsselt den übergebenen cleartext mit dem ebenfalls übergebenen Schlüssel.
+        Zudem wird für den Schlüssel zur späteren Veranschaulichung in html eine Liste erstellt,
+        welche die Schlüsselbuchstaben mit deren zur Entschlüsselung verwendeten Zahlenwert enthält.
+        Für denselben Zweck wird auch für die Verschlüsselung eine Liste erstellt. Diese enthält jeweils die
+        Cleartextbuchstaben, deren Zahlenwert, die angewandten Schlüsselwerte, die Additionsergebnisse der
+        beiden Zahlenwerte sowie die berechneten entschlüsselten Buchstaben
+    :param key: der zur Entschlüsselung verwendete Schlüssel
+    :param cleartext: der zu verschlüsselnde Text
+    :return: key_list (die Schlüsselliste), encrypt_list (dei Verschlüsselungsliste) und der verschlüsselte Text
+    """
 
+    """
+    :param encrypt_list: Liste für die Veranschaulichung der Verschlüsselung
+    :param key_list: Liste für die Veranschaulichung des Schlüssels
+    :param keystand: speichert einen Index von key 
+    :param ciphertext: enthält den verschlüsselten Text
+    """
+    encrypt_list = []
+    key_list = []
+    keystand = 0
+    ciphertext = ""
+
+    # Entfernen ungewollter Zeichen in key und vereinheitlichen der Groß- und Kleinschreibung
+    key = textanpassung_lower(key)
+    # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
+    # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
+    for i in range(len(key)):
+        zahl = ord(key[i]) - 97
+        key_list.append([key[i], zahl])
+
+    # Sicherstellung, dass ciphertext den gewollten Anforderungen entspricht
+    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
+    cleartext = textanpassung_lower(cleartext)
+
+    # Iteration über die Cleartextindexe
+    for index in range(len(cleartext)):
+
+        # Umwandlung des Buchstabens in eine Zahl
+        zeichen = ord(cleartext[index]) - 97
+
+        """
+        Hier wird das betrachtete Zeichen des Klartextet mit dem Schlüsselzeichenwert, welcher sich in dem gespeicherten
+        Indexwert in key befindet, durch Addition der beiden Buchstabenwerte berechnet. Zudem werden der verwendetet
+        Schlüsselzeichenwert, der Klartextbuchstabe (als Zichen und Zahl) und der verschlüsselte Buchstabe
+        (ebenfalls als Zeichen und Zahl) in der Verschlüsselungsliste encrypt_list hinzugefügt
+        """
+        keynumber = key_list[keystand][1]
+        encryptnummer = (zeichen + keynumber) % 26
+        encryptzeichen = chr(encryptnummer + 65)
+        encrypt_list.append([cleartext[index], zeichen, keynumber, encryptnummer, encryptzeichen])
+
+        # keystand auf den nächsten Indexwert setzen und hinzufügen des verschlüsselten Buchstabens in ciphertext
+        keystand += 1
+        keystand = keystand % len(key_list)
+        ciphertext += encryptzeichen
+
+    # todo: anders lösen
+    # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
+    file = open('encrypttext.txt', 'w+')
+    file.writelines(ciphertext)
+    file.close()
+
+    return key_list, encrypt_list, ciphertext
 
 def decrypt_tabelle(key, ciphertext):
-    '''
+    """
     decrypt_tabelle entschlüsselt den übergebenen ciphertext mit dem ebenfalls übergebenen Schlüssel.
     Zudem wird für den Schlüssel zur späteren Veranschaulichung in html eine Liste erstellt,
     welche die Schlüsselbuchstaben mit deren zur Entschlüsselung verwendeten Zahlenwert enthält.
     Für denselben Zweck wird auch für die Entschlüsselung eine Liste erstellt. Diese enthält jeweils die
-    Ciphertextbuchstaben, deren Zahlenwert, der angewante Schlüsselwert, das Additionsergebnis der beiden Zahlenwerte
+    Ciphertextbuchstaben, deren Zahlenwert, der angewante Schlüsselwert, das Subtraktionsergebnis der beiden Zahlenwerte
     sowie den berechneten entschlüsselten Buchstaben
     :param key: der zur Entschlüsselung verwendete Schlüssel
     :param ciphertext: der zu entschlüsselnde Text
     :return: key_list, decrypt_list, cleartext
-    '''
+    """
 
     '''
     :param decrypt_list: Liste für die Veranschaulichung der Entschlüsselung
@@ -60,6 +124,7 @@ def decrypt_tabelle(key, ciphertext):
         keystand = keystand % len(key_list)
         cleartext += decryptzeichen
 
+    # todo: besser lösen
     # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
     # dabei wird der entschlüsselte Text in die Datei geschrieben und die Datei im Anschluss geschlossen
     file = open('decrypttext.txt', 'w+')

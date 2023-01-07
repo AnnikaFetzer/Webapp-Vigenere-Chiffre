@@ -1,8 +1,6 @@
-import time
 
-from Encrypt import encrypt_tabelle
-from VigenereChiffre import decrypt_tabelle
-from VigenereChiffre import kasiski, coincidence_berechnung, textaufteilung, schluesselberechnung
+from VigenereChiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
+from VigenereChiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file
@@ -114,6 +112,10 @@ def entschluesseln_buttonclick():
 @bp_vigenere.route('/decrypt_download', methods=['GET'])
 def decrypt_download_file():
     # todo: parallellnutzung (andere Lösung, automatischer Download bei berechnung, neues berechnen von ciphertext hier?
+
+    test = request.args
+    cleartext = request.args.get("text")
+
     return send_file('decrypttext.txt', as_attachment=True)
 
 
@@ -241,10 +243,8 @@ def gki_methode_buttonclick():
         texttabelle.append([i+1, texte[i]])
 
     # mutual_coincidence_index(texte[0], texte[1])
-    s = time.time()
     sb_return = schluesselberechnung(texteingabe, texte, int(cols), float(threshold))
-    e = time.time()
-    diff = e - s
+
     return render_template('schluesselberechnung.html',
                            text_param=texteingabe,
                            schwellwert_param=threshold,
@@ -261,9 +261,6 @@ def schluessel_js_send():
     return send_file('schluessel.js')
 
 
-
-
-
 @bp_vigenere.route('/matplotimage', methods=['GET'])
 def matplotimage():
     test = request.args
@@ -274,5 +271,3 @@ def matplotimage():
     fname = create_diagram(text1, text2, int(shift))
 
     return send_file(fname)
-
-
