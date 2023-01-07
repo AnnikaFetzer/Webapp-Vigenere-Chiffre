@@ -3,7 +3,8 @@ from VigenereChiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coinciden
 from VigenereChiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
 
-from flask import Blueprint, url_for, redirect, request, render_template, send_file
+from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
+
 # from matplotlib.backends.backend_template import FigureCanvas
 
 
@@ -94,11 +95,19 @@ def entschluesseln_buttonclick():
     datei = request.files['ciphertext_upload']
     inhalt = datei.read().decode('utf-8')
 
-    if inhalt == "":
-        decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
+
+    if schluesseleingabe == "":
+        flash("Es muss ein Schlüssel eingegeben werden")
 
     else:
-        decrypt_return = decrypt_tabelle(schluesseleingabe, inhalt)
+
+        if inhalt == "":
+            decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
+
+        else:
+            decrypt_return = decrypt_tabelle(schluesseleingabe, inhalt)
+
+
 
     return render_template('entschluesseln.html',
                            keytable=decrypt_return[0],

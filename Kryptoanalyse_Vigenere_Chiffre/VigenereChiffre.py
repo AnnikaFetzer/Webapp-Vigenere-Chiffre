@@ -64,6 +64,7 @@ def encrypt_tabelle(key, cleartext):
 
     return key_list, encrypt_list, ciphertext
 
+
 def decrypt_tabelle(key, ciphertext):
     """
     decrypt_tabelle entschlüsselt den übergebenen ciphertext mit dem ebenfalls übergebenen Schlüssel.
@@ -208,6 +209,7 @@ def textanpassung_upper(ciphertext):
             n_ct += ciphertext[i]
 
     return n_ct
+
 
 def textanpassung_lower(text):
     text = text.lower()
