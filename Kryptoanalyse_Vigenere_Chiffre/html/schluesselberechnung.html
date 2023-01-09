@@ -37,13 +37,23 @@
       <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
       <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
       <label for="cipher_text">Eingabe des verschlüsselten Textes:</label><br>
-      <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br>
+      <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
 
       <label for="schwellwert">Eingabe des Schwellwerts (Default 0.065): </label>
       <input type="number" id="schwellwert" name="schwellwert" value="{{schwellwert_param}}"><br>
 
       <label for="keylength">Eingabe der Schlüssellänge: </label>
       <input type="number" id="keylength" name="keylength" value="{{keylength_param}}"><br>
+
+          {% with messages = get_flashed_messages() %}
+             {% if messages %}
+                {% for message in messages %}
+                    <p>
+                        <tagname style="color:red;">{{ message }}</tagname>
+                    </p>
+                {% endfor %}
+            {% endif %}
+          {% endwith %}
 
       <button type="submit">Schlüssel berechnen</button><br>
   </form><br>
@@ -84,13 +94,14 @@
   <!-- Bild laden -->
   <button id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte }})">Grafik berechnen</button>
   <div>
-      <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1={{text_param}}&text2=lala2&shift=0" alt="Matplot Image">
+      <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
   </div>
   <button id="button_zurueck" name="button_zurueck" onclick="lastBild()">vorherige Grafik</button>
   <button id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik</button>
 
 
   <!-- MIc's mit den allen Verschiebungen -->
+  <br><br><br>
   <table>
       <tr>
           <th>i</th>

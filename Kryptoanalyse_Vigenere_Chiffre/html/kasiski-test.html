@@ -30,17 +30,28 @@
       <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
       <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
       <label for="cipher_text">Alternativ:</label><br>
-      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label>
-      <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br><br>
+      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label><br>
+      <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
       <label>
           Zur Berechnung der Schlüssellänge wird wenn vorhanden der Uploadtext verwendet.<br>
           Ist keine Datei vorhanden wird der eingegebene Text verwendet
-      </label><br><br>
+      </label><br>
+          {% with messages = get_flashed_messages() %}
+             {% if messages %}
+                {% for message in messages %}
+                    <p>
+                        <tagname style="color:red;">{{ message }}</tagname>
+                    </p>
+                {% endfor %}
+            {% endif %}
+          {% endwith %}
       <button type="submit">Schlüssellange berechnen</button><br>
   </form>
 
+    <br>
   <form>
-      <p>Wählen Sie zu betrachtendes n-gramm aus.</p>
+      <p>Es wurden {{ng_anzahl}} n-gramme gefunden.</p>
+      <p>Wählen sie ein zu betrachtendes n-gramm aus.</p>
       <p>
           <label>n-gramm:
               <select name="ngramme" size="4">

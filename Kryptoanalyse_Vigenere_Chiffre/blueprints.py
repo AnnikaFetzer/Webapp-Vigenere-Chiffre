@@ -1,6 +1,6 @@
 
 from VigenereChiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
-from VigenereChiffre import textaufteilung, schluesselberechnung
+from VigenereChiffre import textaufteilung, schluesselberechnung, textanpassung_upper
 from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
@@ -13,6 +13,7 @@ bp_vigenere = Blueprint('bp_vigenere', __name__, template_folder='html', url_pre
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Verschlüsselung
+#  <input type="textarea" id="cipher_text" name="cipher_text" value="{{text_param}}"><br>
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/')
 def hauptseite():
@@ -93,11 +94,16 @@ def entschluesseln_buttonclick():
     texteingabe = request.form.get('cipher_text')
     schluesseleingabe = request.form.get('key')
     datei = request.files['ciphertext_upload']
+    # todo handel UnicodeDecodeError -> Fehler ausgeben
     inhalt = datei.read().decode('utf-8')
 
 
     if schluesseleingabe == "":
-        flash("Es muss ein Schlüssel eingegeben werden")
+        flash("Es muss ein Schlüssel eingegeben werden!")
+        return render_template('entschluesseln.html',
+                               key_param=schluesseleingabe,
+                               text_param=texteingabe,
+                               upload_param=datei)
 
     else:
 
@@ -133,7 +139,6 @@ def decrypt_download_file():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/kasiski', methods=['GET'])
 def kasiski_test():
-    # todo
     return render_template('kasiski-test.html')
 
 
@@ -151,17 +156,23 @@ def kasiski_test_buttonclick():
         kasiski_return = kasiski(texteingabe, int(ng_length))
     # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
     elif dateiinhalt == "":
+        texteingabe = textanpassung_upper(texteingabe)
         kasiski_return = kasiski(texteingabe, int(ng_length))
     # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
     else:
+        dateiinhalt = textanpassung_upper(dateiinhalt)
         kasiski_return = kasiski(dateiinhalt, int(ng_length))
         texteingabe = dateiinhalt
+
+    # Anzahl wie viele n-Gramme gefunden wurden
+    anzahl = len(kasiski_return[0])
 
     return render_template('kasiski-test.html',
                            ngramme=kasiski_return[0],
                            gcd=kasiski_return[1],
                            ngramm_param=ng_length,
-                           text_param=texteingabe)
+                           text_param=texteingabe,
+                           ng_anzahl=anzahl)
 
 
 @bp_vigenere.route('/kasiski_js_send', methods=['GET'])
@@ -188,7 +199,7 @@ def koinzidenzindex_methode_buttonclick():
     dateiinhalt = datei.read().decode('utf-8')
 
     if threshold == "":
-        threshold = "0.6"
+        threshold = "0.065"
     if max_cols == "":
         max_cols = 10
 

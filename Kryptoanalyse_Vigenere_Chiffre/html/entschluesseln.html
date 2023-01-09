@@ -22,23 +22,23 @@
     <input type="text" id="key" name="key" value="{{key_param}}"><br>
     <br>
     <label for="ciphertext_upload">Upload für den zu entschlüsselnden Text: </label>
-    <input type="file" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
+    <input type="file" accept=".txt" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
     <label for="cipher_text">Alternativ:</label><br>
-    <label for="cipher_text">Eingabe des zu verschlüsselnden Textes:</label>
-    <input type="text" id="cipher_text" name="cipher_text" value="{{text_param}}"><br>
+    <label for="cipher_text">Eingabe des zu verschlüsselnden Textes:</label><br>
+    <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
 
           {% with messages = get_flashed_messages() %}
              {% if messages %}
                 {% for message in messages %}
-                    <p>{{ message }}</p>
+                    <p>
+                        <tagname style="color:red;">{{ message }}</tagname>
+                    </p>
                 {% endfor %}
             {% endif %}
           {% endwith %}
 
     <button type="submit">Berechnen</button><br>
   </form>
-
-  <br>
 
   <table>
       <tr>
@@ -85,17 +85,13 @@
 
   <br>
 
-  <h3>
+  <p>
       {{cleartext}}
-  </h3>
+  </p>
 
   <form method="get" action="{{url_for('bp_vigenere.decrypt_download_file')}}">
      <button type="submit">Download!</button>
   </form>
-
-  <button type="submit" onclick="{{url_for('bp_vigenere.decrypt_download_file')}}?text={{text_param}}">Download!</button>
-
-
 
 </body>
 </html>

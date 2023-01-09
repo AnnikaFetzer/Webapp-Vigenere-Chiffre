@@ -137,10 +137,6 @@ def decrypt_tabelle(key, ciphertext):
 
 def kasiski(ciphertext: str, ngramm_laenge: int):
 
-    # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
-    ciphertext = textanpassung_upper(ciphertext)
-
     # Dictionary, welche die n-gramme enthält
     ngramme = dict()
 
