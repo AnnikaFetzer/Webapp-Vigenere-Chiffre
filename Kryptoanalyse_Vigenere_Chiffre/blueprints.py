@@ -1,28 +1,22 @@
-
 from VigenereChiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
-from VigenereChiffre import textaufteilung, schluesselberechnung, textanpassung_upper
+from VigenereChiffre import textaufteilung, schluesselberechnung, textanpassung_upper, textanpassung_lower
 from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
 
-# from matplotlib.backends.backend_template import FigureCanvas
-
-
 bp_vigenere = Blueprint('bp_vigenere', __name__, template_folder='html', url_prefix='/Vigenere')
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Verschlüsselung
-#  <input type="textarea" id="cipher_text" name="cipher_text" value="{{text_param}}"><br>
-# ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/')
 def hauptseite():
     return redirect(url_for('bp_vigenere.verschluesseln'))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Verschlüsselung
+# ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/encrypt', methods=['GET'])
 def verschluesseln():
-
     encryptreturn = encrypt_tabelle("rot", "vigenerechiffre")
 
     return render_template('verschluesseln.html',
@@ -35,27 +29,58 @@ def verschluesseln():
 
 @bp_vigenere.route('/encrypt', methods=['POST'])
 def verschluesseln_buttonclick():
-
-    texteingabe = request.form.get('cleartext_text').strip()  # strip entfert leerzeichen
+    texteingabe = request.form.get('cleartext_text').strip()  # strip entfernt Leerzeichen
     schluesseleingabe = request.form.get('key').strip()
     datei = request.files['cleartext_upload']
+    fehlereingabe = False
 
-    # macht keine exception, wenn datei nicht existiert (gibt dann None zurück)
-    # request.files.get('cleartext_upload526126')
+    '''
+        Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+        Kommt es zu diesem Fehler wird die Verschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
+        und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
+        '''
+    try:
+        inhalt = datei.read().decode('utf-8')
+    except UnicodeDecodeError:
+        flash("Die hochgeladene Datei konnte nicht gelesen werden. Es muss eine .txt Datei hochgeladen werden.")
+        return render_template('verschluesseln.html',
+                               key_param=schluesseleingabe,
+                               text_param=texteingabe,
+                               upload_param=datei)
 
-    # variante 1
-    # file.save('pfadzurdatei.txt')
-    # with open('pfadzurdatei.txt') as f:
-    #     inhalt = f.read()
+    # zu verwendende Texteingabe überprüfen:
 
-    # variante 2
-    inhalt = datei.read().decode('utf-8')
+    # Wenn eine Datei geuploadet wurde, wird diese verwendet
+    if inhalt != "":
+        texteingabe = inhalt
 
-    if inhalt == "":
-        encryptreturn = encrypt_tabelle(schluesseleingabe, texteingabe)
+    # bereinigen des Textes auf das Relevante
+    texteingabe = textanpassung_upper(texteingabe)
 
-    else:
-        encryptreturn = encrypt_tabelle(schluesseleingabe, inhalt)
+    # überprüfung auf nicht verwertbare Eingabe des zu verschlüsselnden Textes
+    if texteingabe == "":
+        flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
+
+    # Überprüfung und Bereinigung der Schlüsseleingabe
+    schluesseleingabe = textanpassung_lower(schluesseleingabe)
+    if schluesseleingabe == "":
+        flash("Es muss ein Schlüssel eingegeben werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
+
+    # Behandlung bei fehlerhafter Eingabe:
+    # Der Text wird nicht verschlüsselt, es werden nur die Eingaben wieder zurückgegeben
+    # und auf der html-Seite der/die Fehler ausgegeben.
+    if fehlereingabe:
+        return render_template('verschluesseln.html',
+                               key_param=schluesseleingabe,
+                               text_param=texteingabe,
+                               upload_param=datei)
+
+    # Bei richtiger Eingabe
+    # wird der Text verschlüsselt und alle zur Darstellung benötigten Informationen an
+    # die html-Seite übergeben
+    encryptreturn = encrypt_tabelle(schluesseleingabe, texteingabe)
 
     return render_template('verschluesseln.html',
                            keytable=encryptreturn[0],
@@ -77,7 +102,6 @@ def encrypt_download_file():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/decrypt', methods=['GET'])
 def entschluesseln():
-
     decrypt_return = decrypt_tabelle("rot", "MWZVBXISVYWYWFX")
 
     return render_template('entschluesseln.html',
@@ -90,30 +114,58 @@ def entschluesseln():
 
 @bp_vigenere.route('/decrypt', methods=['POST'])
 def entschluesseln_buttonclick():
-
     texteingabe = request.form.get('cipher_text')
     schluesseleingabe = request.form.get('key')
     datei = request.files['ciphertext_upload']
-    # todo handel UnicodeDecodeError -> Fehler ausgeben
-    inhalt = datei.read().decode('utf-8')
+    fehlereingabe = False
 
-
-    if schluesseleingabe == "":
-        flash("Es muss ein Schlüssel eingegeben werden!")
+    '''
+    Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    Kommt es zu diesem Fehler wird die Entschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
+    und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
+    '''
+    try:
+        inhalt = datei.read().decode('utf-8')
+    except UnicodeDecodeError:
+        flash("Die hochgeladene Datei konnte nicht gelesen werden. Es muss eine .txt Datei hochgeladen werden.")
         return render_template('entschluesseln.html',
                                key_param=schluesseleingabe,
                                text_param=texteingabe,
                                upload_param=datei)
 
-    else:
+    # zu verwendende Texteingabe überprüfen:
 
-        if inhalt == "":
-            decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
+    # Wenn eine Datei geuploadet wurde, wird diese verwendet
+    if inhalt != "":
+        texteingabe = inhalt
 
-        else:
-            decrypt_return = decrypt_tabelle(schluesseleingabe, inhalt)
+    # bereinigen des Textes auf das Relevante
+    texteingabe = textanpassung_upper(texteingabe)
 
+    # überprüfung auf nicht verwertbare Eingabe
+    if texteingabe == "":
+        flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
 
+    # Überprüfung und Bereinigung der Schlüsseleingabe
+    schluesseleingabe = textanpassung_lower(schluesseleingabe)
+    if schluesseleingabe == "":
+        flash("Es muss ein Schlüssel eingegeben werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
+
+    # Behandlung bei fehlerhafter Eingabe:
+    # der Text wird nicht entschlüsselt, es werden nur die Eingaben wieder zurückgegeben
+    # und dann auf der html-Seite der/die Fehler ausgegeben.
+    if fehlereingabe:
+        return render_template('entschluesseln.html',
+                               key_param=schluesseleingabe,
+                               text_param=texteingabe,
+                               upload_param=datei)
+
+    # Bei richtiger Eingabe
+    # wird der Text entschlüsselt und alle zur Darstellung benötigten Informationen an
+    # die html-Seite übergeben
+    decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
 
     return render_template('entschluesseln.html',
                            keytable=decrypt_return[0],
@@ -128,8 +180,8 @@ def entschluesseln_buttonclick():
 def decrypt_download_file():
     # todo: parallellnutzung (andere Lösung, automatischer Download bei berechnung, neues berechnen von ciphertext hier?
 
-    test = request.args
-    cleartext = request.args.get("text")
+    # test = request.args
+    # cleartext = request.args.get("text")
 
     return send_file('decrypttext.txt', as_attachment=True)
 
@@ -144,25 +196,55 @@ def kasiski_test():
 
 @bp_vigenere.route('/kasiski', methods=['POST'])
 def kasiski_test_buttonclick():
+    # die Eingabevariablen aus der html-Seite werden in ng_lenth, teixteingabe und datei gespeichert
     ng_length = request.form.get('ngramm_length')
     texteingabe = request.form.get('cipher_text')
     datei = request.files.get('ciphertext_upload')
-    dateiinhalt = datei.read().decode('utf-8')
 
-    # Todo: abfangen wenn keine/falsche Eingabe der n-gramm-Länge erfolgt ist
-    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
-    if dateiinhalt == "" and texteingabe == "":
-        texteingabe = "MOIRBMOVOXBUEARWALSPHTIHFAPIFNDXMMNMOIPYXLHWAZZXOEMOICYWTIBZNAXSEXKXVNMPXCZXUHSQBSPPHMKESAXY"
-        kasiski_return = kasiski(texteingabe, int(ng_length))
-    # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
-    elif dateiinhalt == "":
-        texteingabe = textanpassung_upper(texteingabe)
-        kasiski_return = kasiski(texteingabe, int(ng_length))
-    # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
-    else:
-        dateiinhalt = textanpassung_upper(dateiinhalt)
-        kasiski_return = kasiski(dateiinhalt, int(ng_length))
+    fehlereingabe = False
+
+    '''
+        Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+        Kommt es zu diesem Fehler wird die n-gramm-Suche an dieser Stelle abgebrochen und somit nicht ausgeführt
+        und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
+        '''
+    try:
+        dateiinhalt = datei.read().decode('utf-8')
+    except UnicodeDecodeError:
+        flash("Die hochgeladene Datei konnte nicht gelesen werden. Es muss eine .txt Datei hochgeladen werden.")
+        return render_template('kasiski-test.html',
+                               ngramm_param=ng_length,
+                               text_param=texteingabe)
+
+    # zu verwendende Texteingabe überprüfen:
+    # Wenn eine Datei geuploadet wurde, wird diese verwendet
+    # Das was im Texteingabefeld steht wird dann nicht weiter beachtet
+    if dateiinhalt != "":
         texteingabe = dateiinhalt
+    # bereinigen des Textes auf das Relevante
+    texteingabe = textanpassung_upper(texteingabe)
+    # überprüfung auf nicht verwertbare Eingabe
+    if texteingabe == "":
+        flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
+
+    #Überprüfung der Eingabe für die n-gramm-länge
+    # todo: ng_length darf nur Zahlen enthalten
+    if ng_length == "":
+        flash("Es muss eine Ganzzahl eingebenen werden, "
+              "welche besagt nach welcher n-gramm Länge im Text gesucht werden soll!")
+        fehlereingabe = True
+
+    # Behandlung bei fehlerhafter Eingabe:
+    # der Text wird nicht auf n-gramme untersucht, es werden nur die Eingaben wieder zurückgegeben
+    # und auf der html-Seite der/die Fehler ausgegeben.
+    if fehlereingabe:
+        return render_template('kasiski-test.html',
+                               ngramm_param=ng_length,
+                               text_param=texteingabe)
+
+    # Suche nach n-grammen
+    kasiski_return = kasiski(texteingabe, int(ng_length))
 
     # Anzahl wie viele n-Gramme gefunden wurden
     anzahl = len(kasiski_return[0])
@@ -192,29 +274,71 @@ def koinzidenzindex_methode():
 
 @bp_vigenere.route('/koinzidenzindex', methods=['POST'])
 def koinzidenzindex_methode_buttonclick():
+    # Die Eingaben der html-Seite in Variablen speichern
     max_cols = request.form.get('cols_number')
     threshold = request.form.get('threshold')
     texteingabe = request.form.get('cipher_text')
     datei = request.files.get('ciphertext_upload')
-    dateiinhalt = datei.read().decode('utf-8')
 
-    if threshold == "":
-        threshold = "0.065"
-    if max_cols == "":
-        max_cols = 10
+    fehlereingabe = False
 
-    # Todo: abfangen wenn leerer/falscher Eingaben
-    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
-    if dateiinhalt == "" and texteingabe == "":
-        texteingabe = "MOIRBMOVOXBUEARWALSPHTIHFAPIFNDXMMNMOIPYXLHWAZZXOEMOICYWTIBZNAXSEXKXVNMPXCZXUHSQBSPPHMKESAXY"
-        ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
-    # Wenn keine Datei hochgeladen wurde, wird kasiski mit Texteingabe aufrufen
-    elif dateiinhalt == "":
-        ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
-    # ansonsten wird kasiski mit dem Dateiinhalt aufgerufen
-    else:
-        ci_return = coincidence_berechnung(str(dateiinhalt), int(max_cols), float(threshold))
+    '''
+    Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    Kommt es zu diesem Fehler wird die Koinzidenindexberechnung an dieser Stelle abgebrochen
+    und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
+    '''
+    try:
+        dateiinhalt = datei.read().decode('utf-8')
+    except UnicodeDecodeError:
+        flash("Die hochgeladene Datei konnte nicht gelesen werden. Es muss eine .txt Datei hochgeladen werden.")
+        return render_template('koinzidenzindex-methode.html',
+                               cols_param=max_cols,
+                               threshold_param=threshold,
+                               text_param=texteingabe)
+
+    # zu verwendende Texteingabe überprüfen:
+    # Wenn eine Datei hochgeladen wurde, wird diese verwendet.
+    # Das, was im Texteingabefeld steht, wird dann nicht weiter beachtet.
+    if dateiinhalt != "":
         texteingabe = dateiinhalt
+    # bereinigen des Textes auf das Relevante
+    texteingabe = textanpassung_upper(texteingabe)
+    # überprüfung auf nicht verwertbare Eingabe
+    if texteingabe == "":
+        flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
+
+    # Überprüfung der Eingabe für maximal zu betrachtende Spaltenanzahl
+    # todo: max_cols darf nur Zahlen enthalten
+    if max_cols == "":
+        flash("Bei der Schlüssellänge/Spaltenanzahl muss eine Ganzzahl eingebenen werden, "
+              "welche besagt in bis zu wie viele Spalten der Text aufgeteilt werden soll!")
+        fehlereingabe = True
+
+
+    if threshold != "":
+        # Überprüfung der Eingabe für den Schwellwert
+        # todo: threshold darf nur Zahlen und ein Komma(.) enthalten
+
+        # ist der threshold nun leer ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
+        if threshold == "":
+            flash("Beim Schwellwert muss eine Kommazahl mit einem Punkt als Trennzeichen eingebenen werden!")
+            fehlereingabe = True
+    # Wenn zum Schwellwert keine Eingabe erfolgt ist, wird threshold auf den defaultwert 0.065 gesetzt
+    else:
+        threshold = "0.065"
+
+    # Behandlung bei fehlerhafter Eingabe:
+    # Für die verschiedenen Spalten werden die Koinzidenzindexe nicht berechnet,
+    # es werden nur die Eingaben wieder zurückgegeben und auf der html-Seite der/die Fehler ausgegeben.
+    if fehlereingabe:
+        return render_template('koinzidenzindex-methode.html',
+                               cols_param=max_cols,
+                               threshold_param=threshold,
+                               text_param=texteingabe)
+
+    # Berechnung der Koinzidenzindexe
+    ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
 
     return render_template('koinzidenzindex-methode.html',
                            cols_param=max_cols,
@@ -238,31 +362,79 @@ def gki_methode():
 
 @bp_vigenere.route('/gegenseitigerKoinzidenzindex', methods=['POST'])
 def gki_methode_buttonclick():
-
+    # Die Eingaben der html-Seite in Variablen speichern
     cols = request.form.get('keylength')
     threshold = request.form.get('schwellwert')
     texteingabe = request.form.get('cipher_text')
     datei = request.files.get('ciphertext_upload')
-    dateiinhalt = datei.read().decode('utf-8')
 
-    # Todo: abfangen wenn keine/falsche Eingabe der n-gramm-Länge erfolgt ist
-    # Todo: besseres abfangen wenn keine Eingabe -> Fehlermeldung
+    fehlereingabe = False
 
-    if threshold == "":
-        threshold = 0.065
+    '''
+    Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    Kommt es zu diesem Fehler wird die Schlüsselberechnung an dieser Stelle abgebrochen 
+    und stattdessen eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
+    '''
+    try:
+        dateiinhalt = datei.read().decode('utf-8')
+    except UnicodeDecodeError:
+        flash("Die hochgeladene Datei konnte nicht gelesen werden. Es muss eine .txt Datei hochgeladen werden.")
+        return render_template('schluesselberechnung.html',
+                               text_param=texteingabe,
+                               schwellwert_param=threshold,
+                               keylength_param=cols,
+                               cols=int(cols))
 
-    # todo: was wenn beides leer?
-    if dateiinhalt == "":
-        texte = textaufteilung(texteingabe, int(cols))
-    else:
-        texte = textaufteilung(dateiinhalt, int(cols))
+    # zu verwendende Texteingabe überprüfen:
+    # Wenn eine Datei hochgeladen wurde, wird diese verwendet.
+    # Das, was im Texteingabefeld steht, wird dann nicht weiter beachtet.
+    if dateiinhalt != "":
         texteingabe = dateiinhalt
+    # Bereinigen des Textes auf das Relevante
+    texteingabe = textanpassung_upper(texteingabe)
+    # überprüfung leere, bzw. falsche Eingabe
+    if texteingabe == "":
+        flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
+        fehlereingabe = True
 
+    if threshold != "":
+        # Überprüfung der Eingabe für den Schwellwert
+        # todo: threshold darf nur Zahlen und ein Komma(.) enthalten
+
+        # ist der threshold nun leer, ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
+        if threshold == "":
+            flash("Beim Schwellwert muss eine Kommazahl mit einem Punkt als Trennzeichen eingebenen werden!")
+            fehlereingabe = True
+    # Wenn zum Schwellwert keine Eingabe erfolgt ist, wird threshold auf den Defaultwert 0.065 gesetzt
+    else:
+        threshold = "0.065"
+
+    # Überprüfung der Eingabe für die Spaltenanzahl
+    # todo: cols darf nur Zahlen enthalten
+    if cols == "":
+        flash("Bei der Schlüssellänge/Spaltenanzahl muss eine Ganzzahl eingebenen werden!")
+        fehlereingabe = True
+
+    # Behandlung bei fehlerhafter Eingabe:
+    # Die Schlüsselberechnung wird an dieser Stelle abgebrochen.
+    # Die in der html-Seite erfolgten Eingaben werden an schluesselberechnung.html übergeben.
+    # Zudem können die mit flash erfolgten Fehlermeldungen auf der html-Seite ausgegeben werden.
+    if fehlereingabe:
+        return render_template('schluesselberechnung.html',
+                               text_param=texteingabe,
+                               schwellwert_param=threshold,
+                               keylength_param=cols,
+                               cols=int(cols))
+
+    # Aufteilung des Textes in texteingabe in so viele Texte/Spalten wie in der Variable cols festgelegt
+    texte = textaufteilung(texteingabe, int(cols))
+
+    # Hinzufügen der Indexe der jeweiligen Texte für die Ausgabe in html
     texttabelle = []
     for i in range(int(cols)):
-        texttabelle.append([i+1, texte[i]])
+        texttabelle.append([i + 1, texte[i]])
 
-    # mutual_coincidence_index(texte[0], texte[1])
+    # Berechnung der möglichen Schlüssel
     sb_return = schluesselberechnung(texteingabe, texte, int(cols), float(threshold))
 
     return render_template('schluesselberechnung.html',
@@ -283,7 +455,7 @@ def schluessel_js_send():
 
 @bp_vigenere.route('/matplotimage', methods=['GET'])
 def matplotimage():
-    test = request.args
+    # test = request.args
     text1 = request.args.get("text1")
     text2 = request.args.get("text2")
     shift = request.args.get("shift")
