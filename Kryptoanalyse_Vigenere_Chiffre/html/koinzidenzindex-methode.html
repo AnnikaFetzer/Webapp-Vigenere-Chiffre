@@ -1,84 +1,138 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vigenere: Koinzidenzindex-Methode</title>
-</head>
+{% extends "base.html" %}
 
-<script src="{{url_for('bp_vigenere.ci_js_send')}}">
+{% block head %}
+
+<!--<title>Vigenere: Koinzidenzindex-Methode</title>-->
+<script src="{{url_for('bp_vigenere.ci_js_send')}}"></script>
+
+{% if ki_tabelle is defined and ki_tabelle|length > 0 %}
+<script type="text/javascript">
+    window.onload = function () {
+        onChangeTextaufteilung('{{ki_tabelle[0]|tojson}}')
+    };
+
+
 </script>
+{% endif %}
 
-<body>
 
-  <h1>Bestimmen der Schlüssellänge mit der Koinzidenzindex-Methode</h1>
+{% endblock %}
 
-   <nav>
-       <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
-       <a href="{{url_for('bp_vigenere.entschluesseln')}}" >Entschlüsseln</a>
-       <a href="{{url_for('bp_vigenere.kasiski_test')}}">Kasiski-Test</a>
-       <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
-       <a href="{{url_for('bp_vigenere.gki_methode')}}">Schlüsselberechnung</a>
-   </nav>
+{% block content %}
+
+<h1>Bestimmen der Schlüssellänge mit der Koinzidenzindex-Methode</h1>
+<hr class="pb-3 mb-5">
+
+<form action="{{url_for('bp_vigenere.koinzidenzindex_methode_buttonclick')}}" method="post"
+      enctype="multipart/form-data">
+    <h2 class="pb-3 mb-3">Dateneingabe</h2>
+    <p>
+        Bitte den Geheimtext, einen Schwellwert
+        und eine Ganzzahl, welche besagt bis zu welcher möglichen Schlüssellänge der Text untersucht werden soll,
+        eingeben. Für den Geheimtext entweder eine Textdatei über den Upload-Button hochladen
+        <b>oder</b> den Text in das Eingabefeld eingeben.
+        Ist ein Upload erfolgt, wird nur dieser verwendet und eine mögliche Eingabe ignoriert.
+    </p>
+    <div class="mb-3">
+        <label for="cols_number" class="form-label">
+            Eingabe bis zu welcher möglichen Schlüssellänge der Text betrachtet werden soll (als positive Ganzzahl):
+        </label>
+        <input type="number" class="form-control" id="cols_number" name="cols_number" value="{{cols_param}}" min="1"
+               step="1">
+    </div>
+    <div class="mb-3">
+        <label for="threshold" class="form-label">Eingabe des zu beachtenden Schwellwerts (Default 0.065):</label>
+        <input type="text" class="form-control" id="threshold" name="threshold" value="{{threshold_param}}">
+    </div>
+    <div class="mb-3">
+        <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
+        <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
+    </div>
+    <div class="mb-3">
+        <label for="cipher_text" class="form-label">Eingabe des verschlüsselten Textes:</label>
+        <textarea id="cipher_text" class="form-control" name="cipher_text" rows="4" cols="50">{{text_param}}</textarea>
+    </div>
 
     <br>
 
-  <form action="{{url_for('bp_vigenere.koinzidenzindex_methode_buttonclick')}}" method="post" enctype="multipart/form-data">
+    <!--Ausgabe von Messages als Alert-->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-      <label for="cols_number">Eingabe bis zu welcher möglichen Schlüssellänge der Text betrachtet werden soll (als positive Ganzzahl): <br></label>
-      <input type="number" id="cols_number" name="cols_number" value="{{cols_param}}"><br><br>
+    <button type="submit" class="btn btn-primary btn-lg">Schlüssellänge berechnen</button>
+</form>
 
-      <label for="threshold">Eingabe des zu beachtenden Schwellwertes (Default 0.065): </label>
-      <input type="text" id="threshold" name="threshold" value="{{threshold_param}}"><br><br>
+{% if ki_tabelle is defined %}
 
-      <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
-      <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
-      <label for="cipher_text">Alternativ:</label><br>
-      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label><br>
-      <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
-
-          {% with messages = get_flashed_messages() %}
-             {% if messages %}
-                {% for message in messages %}
-                    <p>
-                        <tagname style="color:red;">{{ message }}</tagname>
-                    </p>
-                {% endfor %}
-            {% endif %}
-          {% endwith %}
-      <button type="submit">Schlüssellange berechnen</button><br><br>
-  </form>
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Werte mit der Koinzidenzindex-Methode</h2>
 
 
-  <table>
-      {% for item in ki_tabelle %}
-      <tr>
-          <td>{{item[0]}}</td>
-          {% for i in item[2] %}
-          <td> {{i}} </td>
-          {% endfor %}
-      </tr>
-      {% endfor %}
-  </table>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <tr>
+            <th>Länge m</th>
+            <th colspan="{{ki_tabelle|length}}">Koinzidenzindizes</th>
+        </tr>
+        {% for item in ki_tabelle %}
+        <tr>
+            <th>{{item[0]}}</th>
+            {% for i in item[2] %}
+            <td>
 
 
-  <form>
-      <p>Wählen Sie eine genauer zu betrachtende Zeile aus.</p>
-      <p>
-          <label>Zeile:
-              <select name="spalten" size="4">
-                  {% for item in ki_tabelle %}
-                  <option label="{{item[0]}}" onclick="onClickTextaufteilung({{item[0]}}, {{item[1]}}, {{item[2]}})">{{item[0]}}</option>
-                  {% endfor %}
-              </select>
-          </label>
-      </p>
-  </form>
+                {% if i >= threshold_param %}
+                    <b class="text-primary">{{i|round(4)}}</b>
+                {% else %}
+                {{i|round(4)}}
+                {% endif %}
+            </td>
+            {% endfor %}
 
-  <table>
-      <tbody id="ci_berechnung">
+            <!--Nicht gefüllte Zellen erzeugen-->
+            {% for i in range(ki_tabelle[-1][2]|length - item[2]|length) %}
+            <td>----</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
 
-      </tbody>
-  </table>
+    </table>
+</div>
 
-</body>
-</html>
+
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Textaufteilung</h2>
+<div class="mb-3">
+    Wählen Sie eine genauer zu betrachtende Zeile aus.
+</div>
+<br>
+<div class="mb-5 row">
+    <label for="spalten" class="col-sm-2 col-form-label">Spaltenanzahl:</label>
+    <div class="col-sm-3">
+        <select class="form-select" name="spalten" id="spalten" onchange="onChangeTextaufteilung(this.value)">
+            {% for item in ki_tabelle %}
+            <option label="{{item[0]}}" value='{{item|tojson}}'>
+                {{item[0]}}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead id="ci_berechnung_head"></thead>
+        <tbody id="ci_berechnung_body"></tbody>
+    </table>
+</div>
+
+{% endif %}
+
+{% endblock %}

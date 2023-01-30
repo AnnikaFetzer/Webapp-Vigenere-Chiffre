@@ -5,7 +5,6 @@ import numpy as np
 
 def create_diagram(text1: str, text2: str, shift: int):
 
-
     fig, ax = plt.subplots()
 
     x = np.arange(26)
@@ -50,7 +49,7 @@ def create_diagram(text1: str, text2: str, shift: int):
 
     plt.ylabel("frequency")
 
-    plt.legend(["Text1", "Text2"])
+    plt.legend(["Spalte i", "Spalte j"])
 
     plt.savefig('diagram.png')
 

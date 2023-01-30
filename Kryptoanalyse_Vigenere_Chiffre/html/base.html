@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Vigenere Chiffre</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+            crossorigin="anonymous"></script>
+
+    {% block head %}
+    <!-- Ergänzungen zum head einfügen-->
+    {% endblock %}
+</head>
+
+<body>
+<!--Dunkle Navigationsleiste, die beim Scrollen am oberen Seitenrand angezeigt wird-->
+<nav class="navbar navbar-dark sticky-top bg-dark p-3 px-md-4 mb-3">
+    <div class="container-fluid">
+        <!--Hochschullogo-->
+        <a href="/" class="navbar-brand ">
+            <img src="{{url_for('hs_logo')}}" alt="Logo" height="32" class="d-inline-block align-text-top me-2">
+        </a>
+        <span class="fs-4 text-light">Kryptoanalyse der Vigenere Chiffre</span>
+
+        <!--Button zum Öffnen des Menüs-->
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarLight"
+                aria-controls="offcanvasNavbarLight">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!--Dunkles rein fahrendes Menü-->
+        <div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="offcanvasNavbarLight"
+             aria-labelledby="offcanvasNavbarLightLabel">
+
+            <!--Header des Menüs Überschrift und Button zum Schließen des Menüs-->
+            <div class="offcanvas-header">
+                <h4 class="offcanvas-title" id="offcanvasNavbarLightLabel">
+                    <a class="nav-link text-light" href="{{url_for('hauptseite')}}">Vigenere Chiffre</a>
+                </h4>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+            </div>
+
+            <!--Menüeinträge-->
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <hr>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('hauptseite')}}">
+                            Startseite
+                        </a>
+                    </li>
+                    <hr>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.verschluesseln')}}">
+                            Verschlüsseln
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.entschluesseln')}}">
+                            Entschlüsseln
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.kasiski_test')}}">
+                            Kasiski-Test
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">
+                            Koinzidenzindex-Methode
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.gki_methode')}}">
+                            Schlüsselberechnung
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="offcanvas-footer mb-4 mx-auto justify-items-center">
+                <!--Hochschullogo-->
+                <a href="/" class="nav-link">
+                    <img src="{{url_for('hs_logo')}}" alt="Logo" height="32" class="d-inline-block align-text-top me-2">
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--Seitenbreite limitieren-->
+<div class="col-lg-8 mx-auto p-4 py-md-5">
+    <main>
+        {% block content %}
+        <!-- Seiteninhalt hier einfügen-->
+        {% endblock %}
+    </main>
+
+    <!--Abgesetzter Footer-->
+    <footer class="pt-5 my-5 text-muted">
+        <hr>
+        Erstellt als Projektarbeit von Annika Fetzer &middot; &copy; 2023
+    </footer>
+</div>
+
+</body>
+</html>

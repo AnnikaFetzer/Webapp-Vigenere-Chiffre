@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Kryptoanalyse der Vigenere Chiffre</h1>
+<hr class="pb-3 mb-5">
+
+<p class="lead mb-5">
+    Willkommen auf der Startseite der Webanwendung zur Durchführung der Kryptoanalyse der Vigenere Chiffre.
+    <br>
+    Bitte wählen sie einen der aufgeführten Reiter aus.
+</p>
+
+
+<main>
+    <div class="row row-cols-3 row-cols-md-3 mb-3 text-center">
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Verschlüsseln</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mt-3 mb-4">
+                        Verschlüsseln einer hochgeladenen Textdatei oder einens eingeben Textes.
+                    </p>
+                    <button type="button" class="w-100 btn btn-lg btn-primary">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.verschluesseln')}}">
+                            Verschlüsseln
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Entschlüsseln</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mt-3 mb-4">
+                        Entschlüsseln einer hochgeladenen Textdatei oder einens eingeben Textes.
+                    </p>
+                    <button type="button" class="w-100 btn btn-lg btn-primary">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.entschluesseln')}}">
+                            Entschlüsseln
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Kasiski-Test</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mt-3 mb-4">
+                        Bestimmen der Schlüssellänge für einen verschlüsselten Text mit dem Kasiski-Test.
+                    </p>
+                    <button type="button" class="w-100 btn btn-lg btn-primary">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.kasiski_test')}}">
+                            Kasiski-Test
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-3 row-cols-md-3 mb-3 text-center">
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Koinzidenzindex-Methode</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mt-3 mb-4">
+                        Bestimmen der Schlüssellänge für einen verschlüsselten Text mit der Koinzidenzindex-Methode.
+                    </p>
+                    <button type="button" class="w-100 btn btn-lg btn-primary">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">
+                            Koinzidenzindex-Methode
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Schlüsselberechnung</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mt-3 mb-4">
+                        Bestimmen des verwendeten Schlüssels für einen verschlüsselten Text
+                        mithilfe des gegenseitigen Koinzidenzindex
+                    </p>
+                    <button type="button" class="w-100 btn btn-lg btn-primary">
+                        <a class="nav-link text-light" href="{{url_for('bp_vigenere.gki_methode')}}">
+                            Schlüsselberechnung
+                        </a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

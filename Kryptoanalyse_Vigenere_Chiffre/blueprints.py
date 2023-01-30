@@ -342,7 +342,7 @@ def koinzidenzindex_methode_buttonclick():
 
     return render_template('koinzidenzindex-methode.html',
                            cols_param=max_cols,
-                           threshold_param=threshold,
+                           threshold_param=float(threshold),
                            text_param=texteingabe,
                            ki_tabelle=ci_return)
 
@@ -439,7 +439,7 @@ def gki_methode_buttonclick():
 
     return render_template('schluesselberechnung.html',
                            text_param=texteingabe,
-                           schwellwert_param=threshold,
+                           schwellwert_param=float(threshold),
                            keylength_param=cols,
                            cols=int(cols),
                            texte=texttabelle,

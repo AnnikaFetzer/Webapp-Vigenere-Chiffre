@@ -1,195 +1,237 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+{% extends "base.html" %}
 
-    <!-- ggf. wieder löschen: Grafiktest -->
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+{% block head %}
 
-    <title>Vigenere: Schlüsselberechnung</title>
-    <style>
-        table,th,td{border:1px solid #cccccc}
-    </style>
-</head>
-
-<script src="{{url_for('bp_vigenere.schluessel_js_send')}}">
-</script>
-
-<body>
-
-  <h1>Bestimmen des Schlüssels</h1>
-
-  <nav>
-      <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
-      <a href="{{url_for('bp_vigenere.entschluesseln')}}" >Entschlüsseln</a>
-      <a href="{{url_for('bp_vigenere.kasiski_test')}}">Kasiski-Test</a>
-      <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
-      <a href="{{url_for('bp_vigenere.gki_methode')}}">Schlüsselberechnung</a>
-  </nav>
-
-  <br>
-
-  <form action="{{url_for('bp_vigenere.gki_methode_buttonclick')}}" method="post" enctype="multipart/form-data">
-      <label>Eingabe oder upload des Ciphertextes: </label><br>
-      <label>(Wenn vorhanden wird der Upload verwendet)</label><br>
-      <label for="ciphertext_upload">Upload des verschlüsselten Textes: </label>
-      <input type="file" id="ciphertext_upload" name="ciphertext_upload"><br>
-      <label for="cipher_text">Eingabe des verschlüsselten Textes:</label><br>
-      <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
-
-      <label for="schwellwert">Eingabe des Schwellwerts (Default 0.065): </label>
-      <input type="number" id="schwellwert" name="schwellwert" value="{{schwellwert_param}}"><br>
-
-      <label for="keylength">Eingabe der Schlüssellänge: </label>
-      <input type="number" id="keylength" name="keylength" value="{{keylength_param}}"><br>
-
-          {% with messages = get_flashed_messages() %}
-             {% if messages %}
-                {% for message in messages %}
-                    <p>
-                        <tagname style="color:red;">{{ message }}</tagname>
-                    </p>
-                {% endfor %}
-            {% endif %}
-          {% endwith %}
-
-      <button type="submit">Schlüssel berechnen</button><br>
-  </form><br>
+<script src="{{url_for('bp_vigenere.schluessel_js_send')}}"></script>
 
 
-  <!-- Ausgabe des Eingabetextes aufgeteilt in Einzeltexte -->
-  <table>
-      {% for item in texte %}
-      <tr>
-          <td>{{item[0]}}</td>
-          <td>{{item[1]}}</td>
-      </tr>
-      {% endfor %}
-  </table><br>
-
-  <!-- Grafikspaltenauswahl -->
-  <form>
-      <p>Wählen Sie 2 Texte zur Grafischen Darstellung des gegenseitigen Koinzidenzindexes.</p>
-      <p>
-          <label>Text 1:
-              <select id="text1" name="text1" size="3">
-                  {% for item in texte %}
-                  <option label="{{item[0]}}" >{{item[0]}}</option>
-                  {% endfor %}
-              </select>
-          </label>
-          <label>Text 2:
-              <select id="text2" name="text2" size="3">
-                  {% for item in texte %}
-                  <option label="{{item[0]}}" >{{item[0]}}</option>
-                  {% endfor %}
-              </select>
-          </label>
-      </p>
-  </form>
+{% endblock %}
 
 
-  <!-- Bild laden -->
-  <button id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte }})">Grafik berechnen</button>
-  <div>
-      <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
-  </div>
-  <button id="button_zurueck" name="button_zurueck" onclick="lastBild()">vorherige Grafik</button>
-  <button id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik</button>
+{% block content %}
 
 
-  <!-- MIc's mit den allen Verschiebungen -->
-  <br><br><br>
-  <table>
-      <tr>
-          <th>i</th>
-          <th>j</th>
-          <th>MIc(zi,zj^g)</th>
-      </tr>
-      {% for item in mics %}
-      <tr>
-          <td>{{item[0]}}</td>
-          <td>{{item[1]}}</td>
-          <td>
-              {% for werte in item[2] %}
-              {% if werte[1] == item[3] %}
-                {% if werte[1] >= schwellwert_param%}
-                    <tagname style="color:#00FF00;">{{werte[0]}}:{{werte[1]}}</tagname>
+<h1>Schlüsselberechnung</h1>
+<hr class="pb-3 mb-5">
+
+<form action="{{url_for('bp_vigenere.gki_methode_buttonclick')}}" method="post" enctype="multipart/form-data">
+    <h2 class="pb-3 mb-3">Dateneingabe</h2>
+    <p>
+        Bitte den verschlüsselten Text eingeben. Dafür entweder eine Textdatei über den Upload-Button
+        hochladen <b>oder</b> den Text in das Eingabefeld eingeben. Wenn vorhanden, wird der Upload verwendet,
+        unabhängig vom Inhalt des Textfeldes.
+    </p>
+    <div class="mb-3">
+        <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
+        <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
+    </div>
+    <div class="mb-3">
+        <label for="cipher_text" class="form-label">Eingabe des verschlüsselten Textes:</label>
+        <textarea id="cipher_text" class="form-control" name="cipher_text" rows="4"
+                  cols="50">{{text_param}}</textarea>
+    </div>
+    <div class="mb-3">
+        <label for="schwellwert" class="form-label">Eingabe des Schwellwerts (Default 0.065): </label>
+        <input type="number" class="form-control" id="schwellwert" name="schwellwert" step="any"
+               value="{{schwellwert_param}}">
+    </div>
+    <div class="mb-3">
+        <label for="keylength" class="form-label">Eingabe der Schlüssellänge: </label>
+        <input type="number" class="form-control" id="keylength" name="keylength" value="{{keylength_param}}">
+    </div>
+
+    <br>
+
+    <!--Ausgabe von Messages als Alert-->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <button type="submit" class="btn btn-primary btn-large">Schlüssel berechnen</button>
+    <br>
+</form>
+
+{% if schluessel is defined %}
+
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Textaufteilung</h2>
+
+<!-- Ausgabe des Eingabetextes aufgeteilt in Einzeltexte -->
+<div class="table-responsive">
+    <table class="table table-bordered">
+        {% for item in texte %}
+        <tr>
+            <th>Spalte {{item[0]}}</th>
+            <td>{{item[1]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Grafische Darstellung</h2>
+
+<!-- Grafikspaltenauswahl -->
+<p>
+    Wählen Sie 2 Spalten zur Grafischen Darstellung derer Buchstabenhäufigkeiten aus.
+</p>
+
+<div class="mb-3 row">
+    <label class="col-sm-2 col-form-label">Spalte i:</label>
+    <div class="col-sm-3">
+        <select class="form-select" id="text1" name="text1">
+            {% for item in texte %}
+            <option label="{{item[0]}}">{{item[0]}}</option>
+            {% endfor %}
+        </select>
+
+    </div>
+</div>
+<div class="mb-3 row">
+    <label class="col-sm-2 col-form-label">Spalte j:</label>
+    <div class="col-sm-3">
+        <select class="form-select" id="text2" name="text2">
+            {% for item in texte %}
+            <option label="{{item[0]}}">{{item[0]}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+<div class="mb-3">
+    <button class="btn btn-primary" id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte }})">
+        Grafik Berechnen
+    </button>
+</div>
+
+<div class="text-center">
+    <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
+</div>
+<button class="btn btn-primary" id="button_zurueck" name="button_zurueck" onclick="lastBild()"><< vorherige Grafik
+</button>
+<button class="btn btn-primary float-end" id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik
+    >>
+</button>
+
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Alle gegenseitigen Koinzidenzindexe</h2>
+<p>
+    Die blauen und gelben Werte sind hierbei jeweils die maximalen Werte.
+    Ist ein Wert gelb, liegt dieser unter dem Schwellwert.
+    Ist ein Wert blau, ist dieser größer oder gleich groß wie der gegebene Schwellwert.
+</p>
+
+<!-- MIc's mit den allen Verschiebungen -->
+<table class="table table-bordered">
+    <tr>
+        <th class="mx-auto text-center">i</th>
+        <th class="mx-auto text-center">j</th>
+        <th>gegenseitige Koinzidenzindexe mit der jeweiligen Verschiebung</th>
+    </tr>
+    {% for item in mics %}
+    <tr>
+        <td class="mx-auto text-center">{{item[0]}}</td>
+        <td class="mx-auto text-center">{{item[1]}}</td>
+        <td>
+            <!-- grid-template-columns: auto auto auto auto auto; -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, 120px)">
+                {% for werte in item[2] %}
+                <div>
+                    {% if werte[1] == item[3] %}
+
+                    {% if werte[1] >= schwellwert_param %}
+                    <b class="text-primary">{{werte[0]}} : {{werte[1]|round(4)}}</b>
                     {% else %}
-                    <tagname style="color:red;">{{werte[0]}}:{{werte[1]}}</tagname>
-                {% endif %}
-              {% else %}
-                {{werte[0]}}:{{werte[1]}}
-              {% endif %}
-              {% endfor %}
-          </td>
-      </tr>
-      {% endfor %}
-  </table><br>
+                    <b class="text-warning">{{werte[0]}} : {{werte[1]|round(4)}}</b>
+                    {% endif %}
 
+                    {% else %}
+                    {{werte[0]}} : {{werte[1]|round(4)}}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
-  <!-- die berechnete Matrix -->
-  <table>
-      <tr>
-          <th rowspan="2">i</th>
-          <th colspan={{keylength_param}}>j</th>
-      </tr>
-      <tr>
-          {% for item in matrix %}
-          <th>{{item[2]}}</th>
-          {% endfor %}
-          <th>Schlüsselberechnung</th>
-      </tr>
-      {% for row in matrix %}
-      <tr>
-          <th>{{row[2]}}</th>
-          {% for item in row[0] %}
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Matrix zur Schlüsselberechnung</h2>
+<!-- die berechnete Matrix -->
+<table class="table table-bordered">
+    <tr>
+        <th rowspan="2" class="mx-auto text-center">j</th>
+        <th colspan={{keylength_param}} class="mx-auto text-center">i</th>
+    </tr>
+    <tr>
+        {% for item in matrix %}
+        <th class="mx-auto text-center">{{item[2]}}</th>
+        {% endfor %}
+        <th>Schlüsselberechnung</th>
+    </tr>
+    {% for row in matrix %}
+    <tr>
+        <th class="mx-auto text-center">{{row[2]}}</th>
+        {% for item in row[0] %}
+        {% if row[1] == True %}
+        <td class="mx-auto text-center">
+            <b class="text-primary">{{item}}</b>
+        </td>
+        {% else %}
+        <td class="mx-auto text-center">
+            <b class="text-warning">{{item}}</b>
+        </td>
+        {% endif %}
+        {% endfor %}
+        <td>
             {% if row[1] == True %}
-                <td><tagname style="color:green;">{{item}}</tagname></td>
+            (
+            {% for item in row[0] %}
+            k{{row[2]}}+{{item}}
+            {% endfor %}
+            )
             {% else %}
-                <td><tagname style="color:red;">{{item}}</tagname></td>
             {% endif %}
-          {% endfor %}
-          <td>
-              {% if row[1] == True %}
-              (
-              {% for item in row[0] %}
-              k{{row[2]}}+{{item}}
-              {% endfor %}
-              )
-              {% else %}
-              {% endif %}
-          </td>
-      </tr>
-      {% endfor %}
-  </table>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
+{% if schluessel %}
+<!-- Ausgabe Schlüssel -->
+<p>
+    Wählen Sie eine Zeile zur Schlüsselberechnung aus.
+</p>
 
-  <!-- Ausgabe Schlüssel -->
-  <form>
-      <p>Wählen Sie eine Zeile zur Schlüsselberechnung aus.</p>
-      <p>
-          <label>Schlüssel:
-              <select name="keys" size="2">
-                  {% for item in matrix %}
-                  {% if item[1] == True %}
-                  <option label="k{{item[2]}}" onclick="onClickSchluessel({{item[2]}}, {{schluessel}})">k{{item[2]}}</option>
-                  {% endif %}
-                  {% endfor %}
-              </select>
-          </label>
-      </p>
-  </form>
+<div class="mb-3 row">
+    <label class="col-sm-2 col-form-label">Schlüssel:</label>
+    <div class="col-sm-3">
+        <select class="form-select" name="keys">
+            <option label=""></option>
+            {% for item in matrix %}
+            {% if item[1] == True %}
+            <option label="k{{item[2]}}" onclick="onClickSchluessel({{item[2]}}, {{schluessel}})">k{{item[2]}}
+            </option>
+            {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+</div>
 
+<!-- Hier werden später die möglichen Schlüssel mithilfe von Javascript angezeigt -->
+<table class="table table-bordered">
+    <tbody id="schluessel_berechnung">
+    </tbody>
+</table>
 
-  <!-- Hier werden später die möglichen Schlüssel mithilfe von Javascript angezeigt -->
- <table>
-      <tbody id="schluessel_berechnung">
-      </tbody>
-  </table>
+{% endif %}
 
+{% endif %}
 
-</body>
-</html>
+{% endblock %}

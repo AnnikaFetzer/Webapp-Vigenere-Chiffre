@@ -1,97 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vigenere: Entschlüsselung</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block content %}
 
-  <h1>Entschlüsselung mit der Vigenere Chiffre</h1>
+<h1>Entschlüsselung mit der Vigenere Chiffre</h1>
+<hr class="pb-3 mb-5">
 
-   <nav>
-       <a href="{{url_for('bp_vigenere.verschluesseln')}}" >Verschlüsseln</a>
-       <a href="{{url_for('bp_vigenere.entschluesseln')}}" >Entschlüsseln</a>
-       <a href="{{url_for('bp_vigenere.kasiski_test')}}">Kasiski-Test</a>
-       <a href="{{url_for('bp_vigenere.koinzidenzindex_methode')}}">Koinzidenzindex-Methode</a>
-       <a href="{{url_for('bp_vigenere.gki_methode')}}">Schlüsselberechnung</a>
-   </nav>
-
-  <form action="{{url_for('bp_vigenere.entschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
-    <label for="key">Eingabe des Schlüssels:</label>
-    <input type="text" id="key" name="key" value="{{key_param}}"><br>
+<form action="{{url_for('bp_vigenere.entschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
+    <h2 class="pb-3 mb-3">Dateneingabe</h2>
+    <p>
+        Bitte den Schlüssel und den zu entschlüsselnden Text eingeben. Dafür entweder eine Textdatei über den
+        Upload-Button hochladen <b>oder</b> den Text in das Eingabefeld eingeben. Ist ein Upload erfolgt, wird nur
+        dieser verwendet und eine mögliche Eingabe ignoriert.
+    </p>
+    <div class="mb-3">
+        <label for="key" class="form-label">Eingabe des Schlüssels:</label>
+        <input type="text" class="form-control" id="key" name="key" value="{{key_param}}">
+    </div>
     <br>
-    <label for="ciphertext_upload">Upload für den zu entschlüsselnden Text: </label>
-    <input type="file" accept=".txt" id="ciphertext_upload" name="ciphertext_upload" value="{{upload_param}}"><br>
-    <label for="cipher_text">Alternativ:</label><br>
-    <label for="cipher_text">Eingabe des zu verschlüsselnden Textes:</label><br>
-    <textarea id="cipher_text" name="cipher_text" value="{{text_param}}" rows="4" cols="50">{{text_param}}</textarea><br>
+    <div class="mb-3">
+        <label for="ciphertext_upload" class="form-label">Upload für den zu entschlüsselnden Text: </label>
+        <input type="file" class="form-control" accept=".txt" id="ciphertext_upload" name="ciphertext_upload"
+               value="{{upload_param}}">
+    </div>
+    <div class="mb-3">
+        <label for="cipher_text" class="form-label">Eingabe des zu verschlüsselnden Textes:</label><br>
+        <textarea class="form-control" id="cipher_text" name="cipher_text" rows="4" cols="50">{{text_param}}</textarea>
+    </div>
 
-          {% with messages = get_flashed_messages() %}
-             {% if messages %}
-                {% for message in messages %}
-                    <p>
-                        <tagname style="color:red;">{{ message }}</tagname>
-                    </p>
-                {% endfor %}
-            {% endif %}
-          {% endwith %}
+    <br>
 
-    <button type="submit">Berechnen</button><br>
-  </form>
+    <!--Ausgabe von Messages als Alert-->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-  <table>
-      <tr>
-          {% for item in keytable %}
-          <td>{{item[0]}}</td>
-          {% endfor %}
-      </tr>
-      <tr>
-          {% for item in keytable %}
-          <td>{{item[1]}}</td>
-          {% endfor %}
-      </tr>
-  </table>
+    <button type="submit" class="btn btn-primary btn-lg">Text entschlüsseln</button>
+</form>
 
-  <br>
+{% if keytable is defined %}
 
-  <table>
-      <tr>
-          {% for item in decrypttable %}
-          <td>{{item[0]}}</td>
-          {% endfor %}
-      </tr>
-      <tr>
-          {% for item in decrypttable %}
-          <td>{{item[1]}}</td>
-          {% endfor %}
-      </tr>
-      <tr>
-          {% for item in decrypttable %}
-          <td>{{item[2]}}</td>
-          {% endfor %}
-      </tr>
-      <tr>
-          {% for item in decrypttable %}
-          <td>{{item[3]}}</td>
-          {% endfor %}
-      </tr>
-      <tr>
-          {% for item in decrypttable %}
-          <td>{{item[4]}}</td>
-          {% endfor %}
-      </tr>
-  </table>
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Transformieren der Schlüsselbuchstaben</h2>
 
-  <br>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Schlüsselbuchstabe</th>
+            {% for item in keytable %}
+            <th class="mx-auto text-center">{{item[0]}}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tr>
+            <th>Schlüsselbuchstabe als Zahl</th>
+            {% for item in keytable %}
+            <td class="mx-auto text-center">{{item[1]}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
 
-  <p>
-      {{cleartext}}
-  </p>
+<br>
 
-  <form method="get" action="{{url_for('bp_vigenere.decrypt_download_file')}}">
-     <button type="submit">Download!</button>
-  </form>
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Transformieren und entschlüsseln der Geheimtextbuchstaben</h2>
 
-</body>
-</html>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Verschlüsselter Buchstabe</th>
+            {% for item in decrypttable %}
+            <th class="mx-auto text-center">{{item[0]}}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tr>
+            <th>Buchstabe als Zahl</th>
+            {% for item in decrypttable %}
+            <td class="mx-auto text-center">{{item[1]}}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Schlüsselbuchstabe</th>
+            {% for item in decrypttable %}
+            <td class="mx-auto text-center">{{item[2]}}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Entschlüsselte Zahl</th>
+            {% for item in decrypttable %}
+            <td class="mx-auto text-center">{{item[3]}}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Entschlüsselter Buchstabe</th>
+            {% for item in decrypttable %}
+            <td class="mx-auto text-center">{{item[4]}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+
+<hr class="pb-3 my-5">
+<h2 class="pb-3 mb-3">Entschlüsselter Text</h2>
+
+<p style="word-wrap: break-word;">
+    {{cleartext}}
+</p>
+
+<br>
+
+<form method="get" action="{{url_for('bp_vigenere.decrypt_download_file')}}">
+    <button type="submit" class="btn btn-primary btn-lg">Text herunterladen</button>
+</form>
+
+{% endif %}
+
+{% endblock %}

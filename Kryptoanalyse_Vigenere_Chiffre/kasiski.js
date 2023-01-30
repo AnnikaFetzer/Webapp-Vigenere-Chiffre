@@ -1,5 +1,10 @@
 
-function onClickNgramm(ngram, idxs, gcd) {
+function onChangeNgramm(eintragString) {
+    let eintrag = JSON.parse(eintragString)
+    let ngram = eintrag[0]
+    let idxs = eintrag[1]
+    let gcd = eintrag[2]
+
     // Ich bin ein Kommentar
     let text = document.getElementById('cipher_text').value
     // let vorkommen = document.getElementById('ngramme').value
@@ -7,33 +12,44 @@ function onClickNgramm(ngram, idxs, gcd) {
     let ausgabe_text = document.getElementById('ausgabe_text_farbig')
     let ausgabe_pos = document.getElementById('ausgabe_positionen')
 
+    let ausgabe_text_html = ''
+    let ausgabe_positionen_html = ''
+
     /*
     Ausgabe der Positionen des ausgewählten n-gramms
     */
-    ausgabe_pos.innerHTML = '<br><br>' + ngram + " kommt an diesen Positionen vor:" + '<br>'
+    ausgabe_positionen_html = '<b class="text-primary">' + ngram + "</b> kommt an diesen Positionen vor:" + '<br>'
+
+    // Anfang Grid Layout
+    ausgabe_positionen_html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, 120px)">'
+
     for (j=0; j<idxs.length; j++){
-         ausgabe_pos.innerHTML += "i" + j + " = " + idxs[j]
-         if(j+1 < idxs.length){
-             ausgabe_pos.innerHTML += ",  "
-         }
+         ausgabe_positionen_html += "<div>i" + j + " = " + idxs[j] + "</div>"
+         //if(j+1 < idxs.length){
+           //  ausgabe_positionen_html += ", "
+         //}
     }
 
-    // Ausgabe gcd
-    ausgabe_pos.innerHTML += "<br><br>" + "gcd von " + ngram + ":  " + gcd
+    // Ende Grid Layout
+    ausgabe_positionen_html += '</div>'
 
-    ausgabe_text.innerHTML = '<br><br>'
+    // Ausgabe gcd
+    ausgabe_positionen_html += '<br><br>gcd von <b class="text-primary">' + ngram + '</b>:  <b>' + gcd + '</b>'
+
+    // Zusammengebauten html String dem Objekt in der Seite zuweisen
+    ausgabe_pos.innerHTML = ausgabe_positionen_html
 
     /*
      Ausgabe des eingegebenen verschlüsselten Textes,
      in welchen die Vorkommen des ausgewählten n-gramms eingefärbt sind.
     */
     if(idxs[0] != 0){
-        ausgabe_text.innerHTML += text.substring(0, idxs[0])
+        ausgabe_text_html += text.substring(0, idxs[0])
     }
     for (i=0; i<idxs.length; i++){
-        let a = '<tagname style="color:red;">'
+        let a = '<b class="text-primary">'
         let b = text.substring(idxs[i], idxs[i]+ngram.length)
-        let c = '</tagname>'
+        let c = '</b>'
         let d = ''
         if (i+1 != idxs.length) {
             d = text.substring(idxs[i]+ngram.length, idxs[i+1])
@@ -41,7 +57,10 @@ function onClickNgramm(ngram, idxs, gcd) {
         else {
             d = `${text.substring(idxs[i]+ngram.length)}<br><br>`
         }
-        ausgabe_text.innerHTML +=  a + b  + c
-        ausgabe_text.innerHTML += d
+        ausgabe_text_html +=  a + b  + c
+        ausgabe_text_html += d
     }
+
+    // Zusammengebauten html String dem Objekt in der Seite zuweisen
+    ausgabe_text.innerHTML = ausgabe_text_html
 }
