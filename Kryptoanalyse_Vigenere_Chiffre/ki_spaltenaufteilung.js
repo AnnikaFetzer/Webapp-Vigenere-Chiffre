@@ -6,44 +6,27 @@ function onChangeTextaufteilung(eintragString) {
      let spaltentexte = eintrag[1]
      let koinzidenzindexe = eintrag[2]
 
-    let ausgabe_table_head = document.getElementById("ci_berechnung_head")
-    let ausgabe_table_body = document.getElementById("ci_berechnung_body")
-    let zeilenspeicher_head = ""
-    let zeilenspeicher_body = ""
+    let ausgabe_table = document.getElementById("ci_berechnung")
+    let html_code = ""
 
-    // Befüllen der ersten Zeile mit den Spaltennummern
-    zeilenspeicher_head = "<tr>"
-    zeilenspeicher_head += '<th>Spalte</th>'
+    // Befüllen der 1. Zeile mit Beschriftungen Spalte, Koinzidenzindex und Text
+    html_code = "<tr><th class='mx-auto text-center'>Spalte</th><th class='mx-auto text-center'>Koinzidenzindex</th>"
+    html_code += "<th colspan="+ spaltentexte[0].length +">Text</th></tr>"
 
-    for(i=1; i <= spaltenanzahl; i++){
-        zeilenspeicher_head += '<th>' + i + '</th>'
-    }
-    zeilenspeicher_head += "</tr>"
+    for(i=0; i<spaltenanzahl; i++){
 
-    // Befüllen der zweiten Zeile mit dem berechneten Koinzidenzindex der Spalte
-    zeilenspeicher_body += "<tr>"
-    zeilenspeicher_body += '<th>Koinzidenzindex</td>'
+        // Einfügen der Spaltennummer und des gerundeten Koinzidenzindexes am Zeilenanfang
+        html_code += "<tr><th class='mx-auto text-center'>" + (i+1) + "</th><td>"
+        html_code += (Math.round(koinzidenzindexe[i] * 10000)/10000) + "</td>"
 
-    for(j=0; j < koinzidenzindexe.length; j++){
-        zeilenspeicher_body += "<td>" + koinzidenzindexe[j] + "</td>"
-    }
-    zeilenspeicher_body += "</tr>"
-
-    // Befüllen der Spalten mit dem Text
-    k = 0
-    for(k; k < spaltentexte[spaltenanzahl-1].length; k++){
-        zeilenspeicher_body += "<tr>"
-        if (k == 0) {
-
-        zeilenspeicher_body += '<td rowspan="' + spaltentexte[spaltenanzahl-1].length + '"></td>'
+        // Einfügen der Buchstaben des Spaltentextes in die Tabelle
+        for(j=0; j<spaltentexte[i].length; j++){
+            html_code += "<td class='mx-auto text-center'>" + spaltentexte[i][j] + "</td>"
         }
 
-        for(l=0; l < spaltenanzahl; l++){
-            zeilenspeicher_body += "<td>" + spaltentexte[l][k] + "</td>"
-        }
-        zeilenspeicher_body += "</tr>"
+        // Beenden der Zeile
+        html_code += "</tr>"
     }
 
-    ausgabe_table_head.innerHTML = zeilenspeicher_head
-    ausgabe_table_body.innerHTML = zeilenspeicher_body
+    ausgabe_table.innerHTML = html_code
 }

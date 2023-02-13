@@ -1,5 +1,5 @@
-from VigenereChiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
-from VigenereChiffre import textaufteilung, schluesselberechnung, textanpassung_upper, textanpassung_lower
+from vigenere_chiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
+from vigenere_chiffre import textaufteilung, schluesselberechnung, textanpassung_upper, textanpassung_lower
 from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
@@ -240,7 +240,6 @@ def kasiski_test_buttonclick():
     # und auf der html-Seite der/die Fehler ausgegeben.
     if fehlereingabe:
         return render_template('kasiski-test.html',
-                               ngramm_param=ng_length,
                                text_param=texteingabe)
 
     # Suche nach n-grammen
@@ -252,7 +251,6 @@ def kasiski_test_buttonclick():
     return render_template('kasiski-test.html',
                            ngramme=kasiski_return[0],
                            gcd=kasiski_return[1],
-                           ngramm_param=ng_length,
                            text_param=texteingabe,
                            ng_anzahl=anzahl)
 

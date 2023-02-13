@@ -28,17 +28,26 @@
 <form action="{{url_for('bp_vigenere.kasiski_test_buttonclick')}}" method="post" enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
     <p>
-        Bitte die Länge der zu bearbeitenden n-gramme und den verschlüsselten Text eingeben. Dafür entweder
+        Bitte die Länge der zu suchenden n-gramme und den verschlüsselten Text eingeben. Dafür entweder
         eine Textdatei über den Upload-Button hochladen <b>oder</b> den Text in das Eingabefeld eingeben.
         Ist ein Upload erfolgt, wird nur dieser verwendet und eine mögliche Eingabe ignoriert.
     </p>
-    <div class="mb-3">
-        <label for="ngramm_length" class="form-label">
-            Eingabe der Länge der zu bearbeitenden n-grammme (als positive Ganzzahl):
-        </label>
-        <input type="number" class="form-control" id="ngramm_length" name="ngramm_length" min="1" step="1"
-               value="{{ngramm_param}}">
+
+
+    <div class="row mb-3">
+        <label for="ngramm_length" class="form-label">Länge der zu suchenden n-gramme:</label>
+        <div class="col-sm-3">
+            <select class="form-select" id="ngramm_length" name="ngramm_length">
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+            </select>
+        </div>
     </div>
+
     <div class="mb-3">
         <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
         <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
@@ -84,6 +93,7 @@
         </select>
     </div>
 </div>
+
 <div class="mb-3">
     Berechnete Schlüssellänge (häufigster gcd der ermittelten n-gramme): <b>{{gcd}}</b>
 </div>
