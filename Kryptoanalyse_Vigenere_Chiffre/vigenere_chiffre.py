@@ -50,12 +50,6 @@ def encrypt_tabelle(key, cleartext):
         keystand = keystand % len(key_list)
         ciphertext += encryptzeichen
 
-    # todo: anders lösen
-    # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
-    file = open('encrypttext.txt', 'w+')
-    file.writelines(ciphertext)
-    file.close()
-
     return key_list, encrypt_list, ciphertext
 
 
@@ -112,13 +106,6 @@ def decrypt_tabelle(key, ciphertext):
         keystand += 1
         keystand = keystand % len(key_list)
         cleartext += decryptzeichen
-
-    # todo: besser lösen
-    # w+: Die Datei erstellen, falls sie nicht existiert, und dann im Schreibmodus öffnen
-    # dabei wird der entschlüsselte Text in die Datei geschrieben und die Datei im Anschluss geschlossen
-    file = open('decrypttext.txt', 'w+')
-    file.writelines(cleartext)
-    file.close()
 
     return key_list, decrypt_list, cleartext
 

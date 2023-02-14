@@ -1,5 +1,33 @@
 {% extends "base.html" %}
 
+
+{% block head %}
+
+<script>
+    // Funktion für Dateidownload
+    function download(data, filename, type) {
+        var file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob)
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else {
+            var a = document.createElement("a"),
+                    url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+</script>
+
+
+{% endblock %}
+
+
 {% block content %}
 
 <h1>Verschlüsselung mit der Vigenere Chiffre</h1>
@@ -120,9 +148,9 @@
 
 <br>
 
-<form method="get" action="{{url_for('bp_vigenere.encrypt_download_file')}}">
-    <button type="submit" class="btn btn-primary btn-lg">Text herunterladen</button>
-</form>
+<button class="btn btn-primary btn-lg" onclick="download('{{ciphertext}}', 'encrypttext.txt', 'text/plain')">
+    Text herunterladen
+</button>
 
 {% endif %}
 

@@ -1,4 +1,4 @@
-from eingabekontrolle import textanpassung_lower, textanpassung_upper, zahleneingabe
+from eingabekontrolle import textanpassung_lower, textanpassung_upper
 from vigenere_chiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
 from vigenere_chiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
@@ -56,7 +56,7 @@ def verschluesseln_buttonclick():
         texteingabe = inhalt
 
     # bereinigen des Textes auf das Relevante
-    texteingabe = textanpassung_upper(texteingabe)
+    texteingabe = textanpassung_lower(texteingabe)
 
     # überprüfung auf nicht verwertbare Eingabe des zu verschlüsselnden Textes
     if texteingabe == "":
@@ -90,12 +90,6 @@ def verschluesseln_buttonclick():
                            key_param=schluesseleingabe,
                            text_param=texteingabe,
                            upload_param=datei)
-
-
-@bp_vigenere.route('/encrypt_download', methods=['GET'])
-def encrypt_download_file():
-    # todo: parallellnutzung (andere Lösung, atomatischer Download bei berechnung, neues berechnen von ciphertext hier?
-    return send_file('encrypttext.txt', as_attachment=True)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -177,16 +171,6 @@ def entschluesseln_buttonclick():
                            upload_param=datei)
 
 
-@bp_vigenere.route('/decrypt_download', methods=['GET'])
-def decrypt_download_file():
-    # todo: parallellnutzung (andere Lösung, automatischer Download bei berechnung, neues berechnen von ciphertext hier?
-
-    # test = request.args
-    # cleartext = request.args.get("text")
-
-    return send_file('decrypttext.txt', as_attachment=True)
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Kasiski-Test
 # ----------------------------------------------------------------------------------------------------------------------
@@ -229,7 +213,7 @@ def kasiski_test_buttonclick():
         flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
         fehlereingabe = True
 
-    #Überprüfung der Eingabe für die n-gramm-länge
+    # Überprüfung der Eingabe für die n-gramm-länge
     # todo: ng_length darf nur Zahlen enthalten
     if ng_length == "":
         flash("Es muss eine Ganzzahl eingebenen werden, "
@@ -311,7 +295,6 @@ def koinzidenzindex_methode_buttonclick():
         flash("Bei der Schlüssellänge/Spaltenanzahl muss eine Ganzzahl eingebenen werden, "
               "welche besagt in bis zu wie viele Spalten der Text aufgeteilt werden soll!")
         fehlereingabe = True
-
 
     if threshold != "":
         # Überprüfung der Eingabe für den Schwellwert
