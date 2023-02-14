@@ -104,18 +104,21 @@
     </div>
 </div>
 <div class="mb-3">
-    <button class="btn btn-primary" id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte }})">
+    <button class="btn btn-primary" id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte}})">
         Grafik Berechnen
     </button>
 </div>
 
 <div class="text-center">
-    <img id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
+    <img class="img-fluid" id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
 </div>
+
+<div id="grafikwerte" style="word-wrap: break-word;">
+</div>
+
 <button class="btn btn-primary" id="button_zurueck" name="button_zurueck" onclick="lastBild()"><< vorherige Grafik
 </button>
-<button class="btn btn-primary float-end" id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik
-    >>
+<button class="btn btn-primary float-end" id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik >>
 </button>
 
 <hr class="pb-3 my-5">

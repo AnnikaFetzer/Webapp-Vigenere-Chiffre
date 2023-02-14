@@ -1,5 +1,6 @@
+from eingabekontrolle import textanpassung_lower, textanpassung_upper, zahleneingabe
 from vigenere_chiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
-from vigenere_chiffre import textaufteilung, schluesselberechnung, textanpassung_upper, textanpassung_lower
+from vigenere_chiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
@@ -265,8 +266,6 @@ def kasiski_js_send():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/koinzidenzindex', methods=['GET'])
 def koinzidenzindex_methode():
-    test = "UHDJVMBBNFBUKOSYZTFUACBQMIOAUECIFZBCTHANTANEQQPGNTISKBSCSEZBRJBZCGCPQLPRQMNTDCIKTCXAEYAWGNOGWGWZYESVOO"
-    coincidence_berechnung(test, int(4), float(0.65))
     return render_template('koinzidenzindex-methode.html')
 
 
@@ -458,6 +457,6 @@ def matplotimage():
     text2 = request.args.get("text2")
     shift = request.args.get("shift")
 
-    fname = create_diagram(text1, text2, int(shift))
+    diagram = create_diagram(text1, text2, int(shift))
 
-    return send_file(fname)
+    return send_file(diagram)

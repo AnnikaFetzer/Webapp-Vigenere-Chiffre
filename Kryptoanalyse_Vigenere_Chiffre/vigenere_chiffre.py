@@ -4,7 +4,7 @@ def encrypt_tabelle(key, cleartext):
         Zudem wird für den Schlüssel zur späteren Veranschaulichung in html eine Liste erstellt,
         welche die Schlüsselbuchstaben mit deren zur Entschlüsselung verwendeten Zahlenwert enthält.
         Für denselben Zweck wird auch für die Verschlüsselung eine Liste erstellt. Diese enthält jeweils die
-        Cleartextbuchstaben, deren Zahlenwert, die angewandten Schlüsselwerte, die Additionsergebnisse der
+        Klartextbuchstaben, deren Zahlenwert, die angewandten Schlüsselwerte, die Additionsergebnisse der
         beiden Zahlenwerte sowie die berechneten entschlüsselten Buchstaben
     :param key: der zur Entschlüsselung verwendete Schlüssel
     :param cleartext: der zu verschlüsselnde Text
@@ -22,17 +22,11 @@ def encrypt_tabelle(key, cleartext):
     keystand = 0
     ciphertext = ""
 
-    # Entfernen ungewollter Zeichen in key und vereinheitlichen der Groß- und Kleinschreibung
-    key = textanpassung_lower(key)
     # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
     # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
     for i in range(len(key)):
         zahl = ord(key[i]) - 97
         key_list.append([key[i], zahl])
-
-    # Sicherstellung, dass ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
-    cleartext = textanpassung_lower(cleartext)
 
     # Iteration über die Cleartextindexe
     for index in range(len(cleartext)):
@@ -71,7 +65,7 @@ def decrypt_tabelle(key, ciphertext):
     Zudem wird für den Schlüssel zur späteren Veranschaulichung in html eine Liste erstellt,
     welche die Schlüsselbuchstaben mit deren zur Entschlüsselung verwendeten Zahlenwert enthält.
     Für denselben Zweck wird auch für die Entschlüsselung eine Liste erstellt. Diese enthält jeweils die
-    Ciphertextbuchstaben, deren Zahlenwert, der angewante Schlüsselwert, das Subtraktionsergebnis der beiden Zahlenwerte
+    Klartextbuchstaben, deren Zahlenwert, der angewante Schlüsselwert, das Subtraktionsergebnis der beiden Zahlenwerte
     sowie den berechneten entschlüsselten Buchstaben
     :param key: der zur Entschlüsselung verwendete Schlüssel
     :param ciphertext: der zu entschlüsselnde Text
@@ -89,17 +83,11 @@ def decrypt_tabelle(key, ciphertext):
     keystand = 0
     cleartext = ""
 
-    # Entfernen ungewollter Zeichen in key und vereinheitlichen der Groß- und Kleinschreibung
-    key = textanpassung_lower(key)
     # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
     # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
     for i in range(len(key)):
         zahl = ord(key[i]) - 97
         key_list.append([key[i], zahl])
-
-    # Sicherstellung, dass ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben, welche nach textanpassung alle Großbuchstaben sind
-    ciphertext = textanpassung_upper(ciphertext)
 
     # Iteration über den bereinigten ciphertext
     for index in range(len(ciphertext)):
@@ -197,26 +185,6 @@ def kasiski(ciphertext: str, ngramm_laenge: int):
     return relevante_ng, h_gcd
 
 
-def textanpassung_upper(ciphertext):
-    ciphertext = ciphertext.upper()
-    n_ct = ""
-    for i in range(len(ciphertext)):
-        if 65 <= ord(ciphertext[i]) <= 90:
-            n_ct += ciphertext[i]
-
-    return n_ct
-
-
-def textanpassung_lower(text):
-    text = text.lower()
-    n_ct = ""
-    for i in range(len(text)):
-        if 97 <= ord(text[i]) <= 122:
-            n_ct += text[i]
-
-    return n_ct
-
-
 def gcd_berechnung(abstaende):
     r = gcd(abstaende[0], abstaende[1])
     i = 2
@@ -242,10 +210,6 @@ def coincidence_index(text):
     :param text: zu analysierender verschlüsselter Text
     :return: berechneter Koinzidenzindex als Fließkommazahl
     """
-
-    # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
-    text = textanpassung_upper(text)
 
     # Berechnung des Koinzidenzindexes
     c_index = 0
@@ -302,9 +266,6 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
     :param schwellwert:
     :return:
     """
-    # Sicherstellung, dass mit ciphertext den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben großgeschrieben
-    ciphertext = textanpassung_upper(ciphertext)
 
     k_indizes = []
 
@@ -417,10 +378,6 @@ def textaufteilung(ciphertext: str, spaltenanzahl: int):
     :param spaltenanzahl: Zahl, welche angibt in wie viele Texte text aufgeteilt werden soll
     :return: der in spaltenanzahl aufgeteilte Texte aufgeteilte ciphertext
     """
-
-    # Sicherstellung, dass der gegebene Text den gewollten Anforderungen entspricht
-    # d.h. nur die die 26 Standardbuchstaben
-    ciphertext = textanpassung_upper(ciphertext)
 
     # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
     texte = []
