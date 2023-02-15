@@ -1,4 +1,4 @@
-from eingabekontrolle import textanpassung_lower, textanpassung_upper
+from eingabekontrolle import textanpassung_lower, textanpassung_upper, zahleneingabe
 from vigenere_chiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
 from vigenere_chiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
@@ -182,8 +182,8 @@ def kasiski_test():
 @bp_vigenere.route('/kasiski', methods=['POST'])
 def kasiski_test_buttonclick():
     # die Eingabevariablen aus der html-Seite werden in ng_lenth, teixteingabe und datei gespeichert
-    ng_length = request.form.get('ngramm_length')
-    texteingabe = request.form.get('cipher_text')
+    ng_length = request.form.get('ngramm_length').strip()
+    texteingabe = request.form.get('cipher_text').strip()
     datei = request.files.get('ciphertext_upload')
 
     fehlereingabe = False
@@ -213,11 +213,11 @@ def kasiski_test_buttonclick():
         flash("Es muss ein Text eingegeben oder hochgeladen werden, welcher die Buchstaben a-z enthält!")
         fehlereingabe = True
 
-    # Überprüfung der Eingabe für die n-gramm-länge
-    # todo: ng_length darf nur Zahlen enthalten
-    if ng_length == "":
+    # Überprüfung der Eingabe für die n-gramm-Länge
+    ng_length = zahleneingabe(ng_length, False)
+    if ng_length == -1:
         flash("Es muss eine Ganzzahl eingebenen werden, "
-              "welche besagt nach welcher n-gramm Länge im Text gesucht werden soll!")
+              "welche besagt, nach welcher n-gramm Länge im Text gesucht werden soll!")
         fehlereingabe = True
 
     # Behandlung bei fehlerhafter Eingabe:
@@ -256,9 +256,9 @@ def koinzidenzindex_methode():
 @bp_vigenere.route('/koinzidenzindex', methods=['POST'])
 def koinzidenzindex_methode_buttonclick():
     # Die Eingaben der html-Seite in Variablen speichern
-    max_cols = request.form.get('cols_number')
-    threshold = request.form.get('threshold')
-    texteingabe = request.form.get('cipher_text')
+    max_cols = request.form.get('cols_number').strip()
+    threshold = request.form.get('threshold').strip()
+    texteingabe = request.form.get('cipher_text').strip()
     datei = request.files.get('ciphertext_upload')
 
     fehlereingabe = False
@@ -290,18 +290,18 @@ def koinzidenzindex_methode_buttonclick():
         fehlereingabe = True
 
     # Überprüfung der Eingabe für maximal zu betrachtende Spaltenanzahl
-    # todo: max_cols darf nur Zahlen enthalten
-    if max_cols == "":
+    max_cols = zahleneingabe(max_cols, False)
+    if max_cols == -1:
         flash("Bei der Schlüssellänge/Spaltenanzahl muss eine Ganzzahl eingebenen werden, "
-              "welche besagt in bis zu wie viele Spalten der Text aufgeteilt werden soll!")
+              "welche besagt, in bis zu wie viele Spalten der Text aufgeteilt werden soll!")
         fehlereingabe = True
 
     if threshold != "":
         # Überprüfung der Eingabe für den Schwellwert
-        # todo: threshold darf nur Zahlen und ein Komma(.) enthalten
+        threshold = zahleneingabe(threshold, True)
 
-        # ist der threshold nun leer ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
-        if threshold == "":
+        # ist der threshold nun -1 ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
+        if threshold == -1:
             flash("Beim Schwellwert muss eine Kommazahl mit einem Punkt als Trennzeichen eingebenen werden!")
             fehlereingabe = True
     # Wenn zum Schwellwert keine Eingabe erfolgt ist, wird threshold auf den defaultwert 0.065 gesetzt
@@ -379,10 +379,10 @@ def gki_methode_buttonclick():
 
     if threshold != "":
         # Überprüfung der Eingabe für den Schwellwert
-        # todo: threshold darf nur Zahlen und ein Komma(.) enthalten
+        threshold = zahleneingabe(threshold, True)
 
-        # ist der threshold nun leer, ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
-        if threshold == "":
+        # ist der threshold nun -1, ist eine falsche Eingabe erfolgt und es wird eine Fehlermeldung ausgegeben
+        if threshold == -1:
             flash("Beim Schwellwert muss eine Kommazahl mit einem Punkt als Trennzeichen eingebenen werden!")
             fehlereingabe = True
     # Wenn zum Schwellwert keine Eingabe erfolgt ist, wird threshold auf den Defaultwert 0.065 gesetzt
@@ -390,8 +390,8 @@ def gki_methode_buttonclick():
         threshold = "0.065"
 
     # Überprüfung der Eingabe für die Spaltenanzahl
-    # todo: cols darf nur Zahlen enthalten
-    if cols == "":
+    cols = zahleneingabe(cols, False)
+    if cols == -1:
         flash("Bei der Schlüssellänge/Spaltenanzahl muss eine Ganzzahl eingebenen werden!")
         fehlereingabe = True
 

@@ -11,12 +11,6 @@ def encrypt_tabelle(key, cleartext):
     :return: key_list (die Schlüsselliste), encrypt_list (dei Verschlüsselungsliste) und der verschlüsselte Text
     """
 
-    """
-    :param encrypt_list: Liste für die Veranschaulichung der Verschlüsselung
-    :param key_list: Liste für die Veranschaulichung des Schlüssels
-    :param keystand: speichert einen Index von key 
-    :param ciphertext: enthält den verschlüsselten Text
-    """
     encrypt_list = []
     key_list = []
     keystand = 0
@@ -66,16 +60,10 @@ def decrypt_tabelle(key, ciphertext):
     :return: key_list, decrypt_list, cleartext
     """
 
-    '''
-    :param decrypt_list: Liste für die Veranschaulichung der Entschlüsselung
-    :param key_list: Liste für die Veranschaulichung des Schlüssels
-    :param keystand: speichert einen Index von key 
-    :param cleartext: enthält den entschlüsselten Text
-    '''
-    decrypt_list = []
-    key_list = []
-    keystand = 0
-    cleartext = ""
+    decrypt_list = []       # Liste für die Veranschaulichung der Entschlüsselung
+    key_list = []           # Liste für die Veranschaulichung des Schlüssels
+    keystand = 0            # speichert einen Index von key
+    cleartext = ""          # enthält den entschlüsselten Text
 
     # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
     # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
@@ -110,7 +98,21 @@ def decrypt_tabelle(key, ciphertext):
     return key_list, decrypt_list, cleartext
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Kasiski-Test
+# ----------------------------------------------------------------------------------------------------------------------
 def kasiski(ciphertext: str, ngramm_laenge: int):
+    """
+    kasiski sucht im übergebenen Text nach allen möglichen ngrammen der Länge ngramm_lange.
+    Wird ein n-gramm mindestens dreimal gefunden, wird für dieses anhand der Postitionen der Vorkommen
+    der größte gemeinsame Teiler berechnet. Diese n-gramme werden mit deren Positionen und dem größten gemeinsamen
+    Teiler in relevante_ng gespeichert und zusammen mit dem hier ebenfalls ermittelten
+    am häufigsten vorkommenden größten gemeinsamen Teiler zurückgegeben.
+
+    :param ciphertext: verschlüsselter zu analysierender Text
+    :param ngramm_laenge: Zahl, welche die Länge der n-gramme angibt, welche zu finden sind
+    :return: relevante_ng (ein Dictionary mit n-grammen, deren Positionen und dem gcd) und h_gcd (der häufigste gcd)
+    """
 
     # Dictionary, welche die n-gramme enthält
     ngramme = dict()
@@ -173,6 +175,11 @@ def kasiski(ciphertext: str, ngramm_laenge: int):
 
 
 def gcd_berechnung(abstaende):
+    """
+    Berechnet den größten gemeinsamen Teiler von zwei oder mehrerer Zahlen
+    :param abstaende: Liste mit Zahlen (/Abständen der n-gramm-Postitionenen zum ersten n-gramm)
+    :return: der größte gemeinsame Teiler (ggT/gcd)
+    """
     r = gcd(abstaende[0], abstaende[1])
     i = 2
     while (r > 1) and (i < len(abstaende)):
@@ -182,6 +189,12 @@ def gcd_berechnung(abstaende):
 
 
 def gcd(a, b):
+    """
+    Bekommt zwei Zahlen übergeben für welche der größte gemeinsame Teiler berechnet und zurückgegeben wird.
+    :param a: 1. Zahl für welche der größte gemeinsame Teiler berechnet werden soll
+    :param b: 2. Zahl für welche der größte gemeinsame Teiler berechnet werden soll
+    :return: der größte gemeinsame Teiler von a und b
+    """
     while True:
         r = a % b
         a = b
@@ -191,6 +204,9 @@ def gcd(a, b):
     return a
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Koinzidenzindexmethode
+# ----------------------------------------------------------------------------------------------------------------------
 def coincidence_index(text):
     """
     Berechnet den Koinzidenzindex des übergebenen Textes
@@ -210,26 +226,22 @@ def coincidence_index(text):
 
 def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
     """
-    :param ciphertext:
-    :param spaltenanzahl:
-    :param schwellwert:
-    :return:
+    coincidence_test teilt den pbergebenen Text in die gewünschte Anzahl an Spalten auf und berechnet für diese den
+    jeweiligen Koincidenzindex. Zudem wird überprüft, ob alle berechneten Koinzidenzindexe über dem übergebenen
+    Schwellwert liegen.
+    :param ciphertext: der zu analysierende Geheimtext
+    :param spaltenanzahl: Anzahl in wie viele Spalten/Texte der Geheimtext aufgeteilt werden soll
+    :param schwellwert: der zu berücksichtigende Schwellwert
+    :return: die Spaltennzahl, die aufgeteilten Texte, eine Liste mit den Koinzidenzindexen
+    und ob diese alle über dem Schwellwert liegen
     """
 
     # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
-    spalten = []
-    if spaltenanzahl > 1:
-        for i in range(spaltenanzahl):
-            spalten.append(ciphertext[i])
-        s = 0
-        for j in range(spaltenanzahl, len(ciphertext)):
-            spalten[s] = str(spalten[s] + ciphertext[j])
-            s += 1
-            if s > spaltenanzahl - 1:
-                s = 0
-    # wenn nur eine Spalte gegeben ist vereinfachte Lösung, da kein Aufteilen von ciphertext nötig ist.
-    else:
+    if spaltenanzahl == 1:
+        spalten = []
         spalten.append(ciphertext)
+    else:
+        spalten = textaufteilung(ciphertext, spaltenanzahl)
 
     """
     Berechnung der Koinzidenzindexe der entstandenen Texte in spalten.
@@ -248,10 +260,13 @@ def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
 
 def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float):
     """
-    :param ciphertext:
-    :param max_spalten:
-    :param schwellwert:
-    :return:
+    coincidence_berechnung berechnet für alle möglichen Spaltenanzahlen von 1 bis hin zur übergebenen
+    max_spalten-Variable für alle daraus entstandenen Spalten/Texte die Koinzidenzindexe, speichert diese und gibt diese
+    zurück
+    :param ciphertext: verschlüsselter zu analysierender Text
+    :param max_spalten: Zahl welche besagt bis zu wie viele Spalten betrachtet werden sollen
+    :param schwellwert: Zahl, welche den zu beachtenden Schwellwert angibt
+    :return: Liste, welche Listen mit allen Koinzidenzindexen für die jeweiligen Textaufteilungen enthält
     """
 
     k_indizes = []
@@ -262,19 +277,21 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
     return k_indizes
 
 
-# def mutual_coincidence_index(ciphertext: str, cols: int, col_i: int, col_j: int, threshold: float):
+# ----------------------------------------------------------------------------------------------------------------------
+# Schlüssselberechnung
+# ----------------------------------------------------------------------------------------------------------------------
 def mutual_coincidence_index(text_x: str, text_y: str):
     """
     Berechnet den gegenseitigen Koinzidenzindex der zwei übergebenen Texte für jede Verschiebung von text_y.
     Dabei wird der maximale Koinzidenzindex mit dessen Verschiebung ermittelt
-    :param text_x:
-    :param text_y:
+    :param text_x: 1. Text für die Berechnung dessen gegenseitigen Koinzidenzindexes
+    :param text_y: 2. Text für die Berechnung dessen gegenseitigen Koinzidenzindexes
     :return: alle berechneten gegenseitige Koinzidenzindexe sowie der größte berechnete MIc mit dessen Verschiebung
     """
 
-    mics = []
-    max_mic = -1
-    g_maxmic = -1
+    mics = []       # Liste mit den berechneten gegenseitigen Koinzidenzindexen und deren verwendeter Verschiebung
+    max_mic = -1    # größter berechneter gegenseitiger Koinzidenzindex
+    g_maxmic = -1   # die zur Berechnung von max_mic verwendete Verschiebung für text_y
 
     # Berechnung aller MIc's mit allen um g verschobenen Varianten von text_y
     for g in range(26):
@@ -286,7 +303,7 @@ def mutual_coincidence_index(text_x: str, text_y: str):
             mic = mic + text_x.count(chr(i + 65)) * text_y.count(chr(ig + 65))
         mic = mic / (len(text_x) * len(text_y))
 
-        # anfügen des berechneten MIc mit der verwendeten Verschiebung g in mics
+        # Anfügen des berechneten MIc mit der verwendeten Verschiebung g in mics
         mics.append([g, mic])
 
         # Ermittlung, ob der aktuelle MIc der bisher Maximale ist.
@@ -300,11 +317,20 @@ def mutual_coincidence_index(text_x: str, text_y: str):
 
 def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
     """
-    :param texteingabe:
-    :param texte:
-    :param cols:
-    :param schwellwert:
-    :return:
+    schluesselberechnung berechnet zunächst für alle unterschiedlichen Texktkombinationen den gegenseitigen
+    Koinzidenzindex für alle Verschiebungen des zweiten Textes und ermittelt dabei zusätzlich den höchsten Wert.
+    All diese Werte werden im 1. Returnwert gespeichert.
+    Mithilfe der maximalen gegenseitigen Koinzidenzindexe und deren verwendeten Verschiebung wird eine Matrix zur
+    Schlüsselberechnung erstellt und im 2. Returnwert gespeichert.
+    Mit dieser Matrix werden alle möglichen Schlüsselvarianten berechnet und jeweils die ersten 42 Zeichen des
+    verschlüsselten Textes entschlüsselt
+
+    :param texteingabe: der verschlüsselte von html übermittelte Text
+    :param texte: Liste mit aufgeteilten Texten
+    :param cols: Spaltenanzahl, welche der Schlüssellänge entspricht
+    :param schwellwert: der zu beachtende Schwellwert
+    :return: eine Liste, welche für alle ungleichen Textkombinationen alle Koinzidenzindexe mit deren Verschiebung
+    enthält, matrix zur Schlüsselberechnung und eine Liste mit 26 Schlüsseln und den damit entschlüsseltem Anfangstext)
     """
     matrix = []
     alle_mcis = []
@@ -338,8 +364,8 @@ def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
                 alle_mcis.append([i+1, j+1, mci[0], mci[1], mci[2]])
         matrix.append([zeile, gueltiger_key, j+1])
 
-    # Schlüsselberechnung
-    schluessel = []
+    # Schlüsselberechnung anhand der in matrix enthaltenden Werte
+    schluessel = []     # Liste, welche alle 26 möglichen Schlüssel mit dem entschlüsselten Textanfang enthält
     for reihe in range(cols):
         # Wenn die aktuelle Zeile keine -1 enthält und somit der mögliche Schlüssel ermittelbar ist
         if matrix[reihe][1] is True:
@@ -351,7 +377,7 @@ def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
                     key = key + chr(((k + matrix[reihe][0][spalte]) % 26) + 97)
 
                 # Entschlüsselung des Textanfangs mit erhaltenem Schlüssel
-                cleartext = decrypt_tabelle(key, texteingabe[0:24])
+                cleartext = decrypt_tabelle(key, texteingabe[0:42])
 
                 keys.append([chr(k + 97), key, cleartext])
             schluessel.append([reihe+1, keys])
@@ -361,18 +387,19 @@ def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
 
 def textaufteilung(ciphertext: str, spaltenanzahl: int):
     """
+    Teilt den übergebenen Text in die ebenfalls übergebene Anzahl an Texten auf.
     :param ciphertext: gegebener ciphertext
     :param spaltenanzahl: Zahl, welche angibt in wie viele Texte text aufgeteilt werden soll
     :return: der in spaltenanzahl aufgeteilte Texte aufgeteilte ciphertext
     """
 
-    # Aufteilen von ciphertext in die gegebene Anzahl von Spalten
+    # Aufteilen der ersten Buchstaben von ciphertext in die gegebene Anzahl von Spalten
     texte = []
     for i in range(spaltenanzahl):
         texte.append(ciphertext[i])
     aktuelle_spalte = 0
 
-    # Iteration beginnend bei Spaltenanzahl
+    # Iteration beginnend bei Spaltenanzahl, bei welcher der Rest des Textes in die erzeugten Spalten aufgeteilt wird
     for j in range(spaltenanzahl, len(ciphertext)):
         texte[aktuelle_spalte] = str(texte[aktuelle_spalte] + ciphertext[j])
         aktuelle_spalte += 1

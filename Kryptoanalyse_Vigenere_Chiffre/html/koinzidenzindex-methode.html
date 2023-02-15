@@ -95,7 +95,12 @@
         <!-- Befüllen der Tabelle mit den in ki_tabelle enthltenden Werten -->
         {% for item in ki_tabelle %}
         <tr>
-            <th>{{item[0]}}</th>
+            {% if item[3] >= threshold_param %}
+            <th><b class="text-primary">{{item[0]}}</b></th>
+            {% else %}
+            <th><b class="text-warning">{{item[0]}}</b></th>
+            {% endif %}
+
             {% for i in item[2] %}
             <td>
                 {% if i >= threshold_param %}
