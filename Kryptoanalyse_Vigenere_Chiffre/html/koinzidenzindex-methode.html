@@ -2,7 +2,6 @@
 
 {% block head %}
 
-<!--<title>Vigenere: Koinzidenzindex-Methode</title>-->
 <script src="{{url_for('bp_vigenere.ci_js_send')}}"></script>
 
 {% if ki_tabelle is defined and ki_tabelle|length > 0 %}
@@ -10,8 +9,6 @@
     window.onload = function () {
         onChangeTextaufteilung('{{ki_tabelle[0]|tojson}}')
     };
-
-
 </script>
 {% endif %}
 
@@ -20,12 +17,16 @@
 
 {% block content %}
 
+<!-- Überschrift -->
 <h1>Bestimmen der Schlüssellänge mit der Koinzidenzindex-Methode</h1>
 <hr class="pb-3 mb-5">
 
+<!-- Formular, welches eingegebene Daten bei Buttonklick an Blueprint weitergibt-->
 <form action="{{url_for('bp_vigenere.koinzidenzindex_methode_buttonclick')}}" method="post"
       enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
+
+    <!-- Beschreibung zur richtigen Eingabe -->
     <p>
         Bitte den Geheimtext, einen Schwellwert
         und eine Ganzzahl, welche besagt bis zu welcher möglichen Schlüssellänge der Text untersucht werden soll,
@@ -33,6 +34,8 @@
         <b>oder</b> den Text in das Eingabefeld eingeben.
         Ist ein Upload erfolgt, wird nur dieser verwendet und eine mögliche Eingabe ignoriert.
     </p>
+
+    <!-- Eingabe zu betrachtenden maximalschlüssellänge-->
     <div class="mb-3">
         <label for="cols_number" class="form-label">
             Eingabe bis zu welcher möglichen Schlüssellänge der Text betrachtet werden soll (als positive Ganzzahl):
@@ -40,14 +43,20 @@
         <input type="number" class="form-control" id="cols_number" name="cols_number" value="{{cols_param}}" min="1"
                step="1">
     </div>
+
+    <!-- Schwellwerteingabe -->
     <div class="mb-3">
         <label for="threshold" class="form-label">Eingabe des zu beachtenden Schwellwerts (Default 0.065):</label>
         <input type="text" class="form-control" id="threshold" name="threshold" value="{{threshold_param}}">
     </div>
+
+    <!-- Dateiupload -->
     <div class="mb-3">
         <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
         <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
     </div>
+
+    <!-- Texteingabefeld -->
     <div class="mb-3">
         <label for="cipher_text" class="form-label">Eingabe des verschlüsselten Textes:</label>
         <textarea id="cipher_text" class="form-control" name="cipher_text" rows="4" cols="50">{{text_param}}</textarea>
@@ -66,6 +75,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Button für Blueprintaufruf -->
     <button type="submit" class="btn btn-primary btn-lg">Schlüssellänge berechnen</button>
 </form>
 
@@ -74,20 +84,20 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Werte mit der Koinzidenzindex-Methode</h2>
 
-
+<!-- Tabelle mit den berechneten Koinzidenzindexen-->
 <div class="table-responsive">
     <table class="table table-bordered">
         <tr>
             <th>Länge m</th>
             <th colspan="{{ki_tabelle|length}}">Koinzidenzindizes</th>
         </tr>
+
+        <!-- Befüllen der Tabelle mit den in ki_tabelle enthltenden Werten -->
         {% for item in ki_tabelle %}
         <tr>
             <th>{{item[0]}}</th>
             {% for i in item[2] %}
             <td>
-
-
                 {% if i >= threshold_param %}
                     <b class="text-primary">{{i|round(4)}}</b>
                 {% else %}
@@ -113,6 +123,9 @@
     Wählen Sie eine genauer zu betrachtende Zeile aus.
 </div>
 <br>
+
+<!-- Dropdown-Auswahl für zu betrachtende Textaufteilung -->
+<!-- bei Änderung der Auswahl erfolgt ein Javascriptaufruf-->
 <div class="mb-5 row">
     <label for="spalten" class="col-sm-2 col-form-label">Spaltenanzahl:</label>
     <div class="col-sm-3">
@@ -126,6 +139,7 @@
     </div>
 </div>
 
+<!-- mit Javascript erzeugte Tabelle zur veranschaulichung der Textaufteilung-->
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead id="ci_berechnung"></thead>

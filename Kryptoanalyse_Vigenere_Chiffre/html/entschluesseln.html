@@ -30,9 +30,11 @@
 
 {% block content %}
 
+<!-- Überschrift -->
 <h1>Entschlüsselung mit der Vigenere Chiffre</h1>
 <hr class="pb-3 mb-5">
 
+<!-- Formular, welches eingegebene Daten bei Buttonklick an Blueprint weitergibt-->
 <form action="{{url_for('bp_vigenere.entschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
     <p>
@@ -40,16 +42,19 @@
         Upload-Button hochladen <b>oder</b> den Text in das Eingabefeld eingeben. Ist ein Upload erfolgt, wird nur
         dieser verwendet und eine mögliche Eingabe ignoriert.
     </p>
+    <!-- Schlüsseleingabe -->
     <div class="mb-3">
         <label for="key" class="form-label">Eingabe des Schlüssels:</label>
         <input type="text" class="form-control" id="key" name="key" value="{{key_param}}">
     </div>
     <br>
+    <!-- Dateiupload -->
     <div class="mb-3">
         <label for="ciphertext_upload" class="form-label">Upload für den zu entschlüsselnden Text: </label>
         <input type="file" class="form-control" accept=".txt" id="ciphertext_upload" name="ciphertext_upload"
                value="{{upload_param}}">
     </div>
+    <!-- Texteingabefeld -->
     <div class="mb-3">
         <label for="cipher_text" class="form-label">Eingabe des zu verschlüsselnden Textes:</label><br>
         <textarea class="form-control" id="cipher_text" name="cipher_text" rows="4" cols="50">{{text_param}}</textarea>
@@ -68,6 +73,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Button -->
     <button type="submit" class="btn btn-primary btn-lg">Text entschlüsseln</button>
 </form>
 
@@ -76,6 +82,7 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Transformieren der Schlüsselbuchstaben</h2>
 
+<!-- Tabelle mit Schlüssel -->
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -100,6 +107,7 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Transformieren und entschlüsseln der Geheimtextbuchstaben</h2>
 
+<!-- Tabelle zur Entschlüsselung-->
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -140,12 +148,14 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Entschlüsselter Text</h2>
 
+<!-- entschlüsselter Text -->
 <p style="word-wrap: break-word;">
     {{cleartext}}
 </p>
 
 <br>
 
+<!-- Button, welcher mit dem script eine Download-Datei erstellt und downloadet -->
 <button class="btn btn-primary btn-lg" onclick="download('{{cleartext}}', 'decrypttext.txt', 'text/plain')">
     Text herunterladen
 </button>

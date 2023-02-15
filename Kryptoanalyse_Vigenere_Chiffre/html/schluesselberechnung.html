@@ -1,40 +1,46 @@
 {% extends "base.html" %}
 
 {% block head %}
-
 <script src="{{url_for('bp_vigenere.schluessel_js_send')}}"></script>
-
-
 {% endblock %}
 
 
 {% block content %}
-
-
+<!-- Überschrift -->
 <h1>Schlüsselberechnung</h1>
 <hr class="pb-3 mb-5">
 
+<!-- Formular, welches eingegebene Daten bei Buttonklick an Blueprint weitergibt-->
 <form action="{{url_for('bp_vigenere.gki_methode_buttonclick')}}" method="post" enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
+    <!-- Eingabeerklärung -->
     <p>
         Bitte den verschlüsselten Text eingeben. Dafür entweder eine Textdatei über den Upload-Button
         hochladen <b>oder</b> den Text in das Eingabefeld eingeben. Wenn vorhanden, wird der Upload verwendet,
         unabhängig vom Inhalt des Textfeldes.
     </p>
+
+    <!-- Dateiupload -->
     <div class="mb-3">
         <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
         <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
     </div>
+
+    <!-- Texteingabe -->
     <div class="mb-3">
         <label for="cipher_text" class="form-label">Eingabe des verschlüsselten Textes:</label>
         <textarea id="cipher_text" class="form-control" name="cipher_text" rows="4"
                   cols="50">{{text_param}}</textarea>
     </div>
+
+    <!-- Schwellwerteingabe -->
     <div class="mb-3">
         <label for="schwellwert" class="form-label">Eingabe des Schwellwerts (Default 0.065): </label>
         <input type="number" class="form-control" id="schwellwert" name="schwellwert" step="any"
                value="{{schwellwert_param}}">
     </div>
+
+    <!-- Eingabe der Schlüssellänge -->
     <div class="mb-3">
         <label for="keylength" class="form-label">Eingabe der Schlüssellänge: </label>
         <input type="number" class="form-control" id="keylength" name="keylength" value="{{keylength_param}}">
@@ -53,6 +59,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Button für Blueprintaufruf -->
     <button type="submit" class="btn btn-primary btn-large">Schlüssel berechnen</button>
     <br>
 </form>
@@ -81,7 +88,7 @@
 <p>
     Wählen Sie 2 Spalten zur Grafischen Darstellung derer Buchstabenhäufigkeiten aus.
 </p>
-
+<!-- Auswahl Spalte 1 -->
 <div class="mb-3 row">
     <label class="col-sm-2 col-form-label">Spalte i:</label>
     <div class="col-sm-3">
@@ -90,9 +97,9 @@
             <option label="{{item[0]}}">{{item[0]}}</option>
             {% endfor %}
         </select>
-
     </div>
 </div>
+<!-- Auswahl Spalte 2-->
 <div class="mb-3 row">
     <label class="col-sm-2 col-form-label">Spalte j:</label>
     <div class="col-sm-3">
@@ -103,12 +110,16 @@
         </select>
     </div>
 </div>
+
+<!-- Button fürs Grafik erzeugen-->
+<!-- gibt mit Javascript die für die Grafik benötigten Texte in die Url der Grafik ein-->
 <div class="mb-3">
-    <button class="btn btn-primary" id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{ texte}})">
+    <button class="btn btn-primary" id="button_anzeigen" name="button_anzeigen" onclick="bildNeuLaden({{texte}})">
         Grafik Berechnen
     </button>
 </div>
 
+<!-- Ausgabe der Grafik, welche in zugehörigem Blueprint erzeugt wird-->
 <div class="text-center">
     <img class="img-fluid" id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
 </div>
@@ -116,8 +127,10 @@
 <div id="grafikwerte" style="word-wrap: break-word;">
 </div>
 
+<!-- Button für Links-schift. Ändert mit Javascript den Shift in der Url der Grafik um -1 -->
 <button class="btn btn-primary" id="button_zurueck" name="button_zurueck" onclick="lastBild()"><< vorherige Grafik
 </button>
+<!-- Button für Rechts-shift. Ändert mit Javascript den Shift in der Url der Grafik um +1 -->
 <button class="btn btn-primary float-end" id="button_weiter" name="button_weiter" onclick="nextBild()">nächste Grafik >>
 </button>
 
@@ -129,7 +142,7 @@
     Ist ein Wert blau, ist dieser größer oder gleich groß wie der gegebene Schwellwert.
 </p>
 
-<!-- MIc's mit den allen Verschiebungen -->
+<!-- Tabelle der MIc's mit den allen Verschiebungen des 2. Textes/von Text j -->
 <table class="table table-bordered">
     <tr>
         <th class="mx-auto text-center">i</th>
@@ -141,7 +154,6 @@
         <td class="mx-auto text-center">{{item[0]}}</td>
         <td class="mx-auto text-center">{{item[1]}}</td>
         <td>
-            <!-- grid-template-columns: auto auto auto auto auto; -->
             <div style="display: grid; grid-template-columns: repeat(auto-fill, 120px)">
                 {% for werte in item[2] %}
                 <div>
@@ -207,11 +219,11 @@
 </table>
 
 {% if schluessel %}
-<!-- Ausgabe Schlüssel -->
 <p>
     Wählen Sie eine Zeile zur Schlüsselberechnung aus.
 </p>
 
+<!-- Auswahldropdown welche Schlüsselberechnung genutzt werden soll-->
 <div class="mb-3 row">
     <label class="col-sm-2 col-form-label">Schlüssel:</label>
     <div class="col-sm-3">

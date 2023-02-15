@@ -2,7 +2,6 @@
 
 
 {% block head %}
-
 <script>
     // Funktion für Dateidownload
     function download(data, filename, type) {
@@ -23,33 +22,41 @@
         }
     }
 </script>
-
-
 {% endblock %}
 
 
 {% block content %}
 
+<!-- Überschrift -->
 <h1>Verschlüsselung mit der Vigenere Chiffre</h1>
 <hr class="pb-3 mb-5">
 
+<!-- Formular, welches eingegebene Daten bei Buttonklick an Blueprint weitergibt-->
 <form action="{{url_for('bp_vigenere.verschluesseln_buttonclick')}}" method="post" enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
+
+    <!-- Eingabebeschreibung -->
     <p>
         Bitte den Schlüssel und den zu verschlüsselnden Text eingeben. Dafür entweder eine Textdatei über den
         Upload-Button hochladen <b>oder</b> den Text in das Eingabefeld eingeben. Ist ein Upload erfolgt, wird nur
         dieser verwendet und eine mögliche Eingabe ignoriert.
     </p>
+
+    <!-- Schlüsseleingabe -->
     <div class="mb-3">
         <label for="key" class="form-label">Eingabe des Schlüssels:</label>
         <input type="text" class="form-control" id="key" name="key" value="{{key_param}}">
     </div>
     <br>
+
+    <!-- Dateiupload -->
     <div>
         <label for="cleartext_upload" class="form-label">Upload für den zu verschlüsselnden Text: </label>
         <input type="file" class="form-control" id="cleartext_upload" name="cleartext_upload" value="{{upload_param}}">
     </div>
     <br>
+
+    <!-- Texteingabe -->
     <div class="mb-3">
         <label for="cleartext_text" class="form-label">Eingabe des zu verschlüsselnden Textes:</label>
         <textarea class="form-control" id="cleartext_text" name="cleartext_text" rows="4"
@@ -69,6 +76,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Button für Blueprintaufruf -->
     <button type="submit" class="btn btn-primary btn-lg">Text verschlüsseln</button>
 </form>
 
@@ -78,6 +86,7 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Transformieren der Schlüsselbuchstaben</h2>
 
+<!-- Schlüsseltabelle -->
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -102,6 +111,7 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Transformieren und verschlüsseln der Klartextbuchstaben</h2>
 
+<!-- Verschlüsselungstabelle -->
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -142,12 +152,14 @@
 <hr class="pb-3 my-5">
 <h2 class="pb-3 mb-3">Verschlüsselter Text</h2>
 
+<!-- Verschlüsselte Text -->
 <p style="word-wrap: break-word;">
     {{ciphertext}}
 </p>
 
 <br>
 
+<!-- Button, welcher mithilfe von Javascript eine Datei mit dem verschlüsselten Text erstellt und diese herunterlädt -->
 <button class="btn btn-primary btn-lg" onclick="download('{{ciphertext}}', 'encrypttext.txt', 'text/plain')">
     Text herunterladen
 </button>

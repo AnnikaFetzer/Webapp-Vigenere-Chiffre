@@ -2,7 +2,6 @@
 
 {% block head %}
 
-<!--<title>Vigenere: Kasiski-Test</title>-->
 <script src="{{url_for('bp_vigenere.kasiski_js_send')}}"></script>
 
 {% if ngramme is defined and ngramme|length > 0 %}
@@ -10,9 +9,6 @@
     window.onload = function () {
         onChangeNgramm('{{ngramme[0]|tojson}}')
     };
-
-
-
 </script>
 {% endif %}
 
@@ -22,18 +18,22 @@
 
 {% block content %}
 
+<!-- Überschrift -->
 <h1>Bestimmen der Schlüssellänge mit dem Kasiski-Test</h1>
 <hr class="pb-3 mb-5">
 
+<!-- Formular, welches eingegebene Daten bei Buttonklick an Blueprint weitergibt-->
 <form action="{{url_for('bp_vigenere.kasiski_test_buttonclick')}}" method="post" enctype="multipart/form-data">
     <h2 class="pb-3 mb-3">Dateneingabe</h2>
+
+    <!-- Eingabebeschreibung -->
     <p>
         Bitte die Länge der zu suchenden n-gramme und den verschlüsselten Text eingeben. Dafür entweder
         eine Textdatei über den Upload-Button hochladen <b>oder</b> den Text in das Eingabefeld eingeben.
         Ist ein Upload erfolgt, wird nur dieser verwendet und eine mögliche Eingabe ignoriert.
     </p>
 
-
+    <!-- n-gramm-Längeneingabe über dropdown -->
     <div class="row mb-3">
         <label for="ngramm_length" class="form-label">Länge der zu suchenden n-gramme:</label>
         <div class="col-sm-3">
@@ -48,10 +48,13 @@
         </div>
     </div>
 
+    <!-- Dateiupload -->
     <div class="mb-3">
         <label for="ciphertext_upload" class="form-label">Upload des verschlüsselten Textes: </label>
         <input type="file" class="form-control" id="ciphertext_upload" name="ciphertext_upload">
     </div>
+
+    <!-- Texteingabefeld -->
     <div class="mb-3">
         <label for="cipher_text" class="form-label">Eingabe des verschlüsselten Textes:</label>
         <textarea class="form-control" id="cipher_text" name="cipher_text" rows="4" cols="50">{{text_param}}</textarea>
@@ -70,6 +73,7 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Button für Formularweiterleitung-->
     <button type="submit" class="btn btn-primary btn-lg">Schlüssellänge berechnen</button>
 </form>
 
@@ -81,6 +85,9 @@
 <p>
     Es wurden {{ng_anzahl}} n-gramme gefunden. Bitte wählen Sie ein zu betrachtendes n-gramm aus.
 </p>
+
+<!-- Auswahldropdown für gefundene n-gramme-->
+<!-- erfolg eine neue Auswahl wird onChangeNgramm in kasiski.js ausgeführt-->
 <div class="row mb-4">
     <label for="ngramme" class="col-sm-2 col-form-label">n-gramm:</label>
     <div class="col-sm-3">
@@ -98,9 +105,13 @@
     Berechnete Schlüssellänge (häufigster gcd der ermittelten n-gramme): <b>{{gcd}}</b>
 </div>
 
+<!-- Ausgabe der Positionen im Text des ausgewählten n-gramms -->
+<!-- wird durch kasiski.js befüllt -->
 <div class="py-3" id="ausgabe_positionen">
 </div>
 
+<!-- Ausgabe des Textes mit farblicher hervorhebung des ausgewählten n-gramms -->
+<!-- wird durch kasiski.js befüllt-->
 <div id="ausgabe_text_farbig" style="word-wrap: break-word;">
 </div>
 
