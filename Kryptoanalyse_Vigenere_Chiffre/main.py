@@ -1,5 +1,5 @@
 
-from flask import Flask, redirect, url_for, send_file, render_template
+from flask import Flask, send_file, render_template
 
 from blueprints import bp_vigenere
 
@@ -12,6 +12,7 @@ webapp.register_blueprint(bp_vigenere)
 
 @webapp.route('/')
 def hauptseite():
+    # bei Aufruf von localhost wird die Seite index.html geladen
     return render_template('index.html')
 
 
@@ -20,7 +21,5 @@ def hs_logo():
     return send_file('hs-aalen.svg', as_attachment=True)
 
 
+# localer Server auf port 80 starten
 webapp.run(host='localhost', port=80)
-
-
-

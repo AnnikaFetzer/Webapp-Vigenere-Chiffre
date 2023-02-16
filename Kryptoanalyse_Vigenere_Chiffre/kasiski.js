@@ -5,19 +5,15 @@ function onChangeNgramm(eintragString) {
     let idxs = eintrag[1]
     let gcd = eintrag[2]
 
-    // Ich bin ein Kommentar
+    // Elemente aus html holen und speichern
     let text = document.getElementById('cipher_text').value
-    // let vorkommen = document.getElementById('ngramme').value
-
     let ausgabe_text = document.getElementById('ausgabe_text_farbig')
     let ausgabe_pos = document.getElementById('ausgabe_positionen')
 
     let ausgabe_text_html = ''
     let ausgabe_positionen_html = ''
 
-    /*
-    Ausgabe der Positionen des ausgewählten n-gramms
-    */
+    //Ausgabe der Positionen des ausgewählten n-gramms
     ausgabe_positionen_html = '<b class="text-primary">' + ngram + "</b> kommt an diesen Positionen vor:" + '<br>'
 
     // Anfang Grid Layout
@@ -25,9 +21,6 @@ function onChangeNgramm(eintragString) {
 
     for (j=0; j<idxs.length; j++){
          ausgabe_positionen_html += "<div>i" + j + " = " + idxs[j] + "</div>"
-         //if(j+1 < idxs.length){
-           //  ausgabe_positionen_html += ", "
-         //}
     }
 
     // Ende Grid Layout

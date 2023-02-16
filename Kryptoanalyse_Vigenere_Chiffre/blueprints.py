@@ -5,12 +5,14 @@ from grafik import create_diagram
 
 from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
 
+# Blueprint definieren
 bp_vigenere = Blueprint('bp_vigenere', __name__, template_folder='html', url_prefix='/Vigenere')
 
 
 @bp_vigenere.route('/')
 def hauptseite():
-    return redirect(url_for('bp_vigenere.verschluesseln'))
+    # Erfolgt ein Seitenaufruf von "http://localhost/Vigenere/" so wird die Seite index.html geladen
+    return render_template('index.html')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -20,6 +22,7 @@ def hauptseite():
 def verschluesseln():
     encryptreturn = encrypt_tabelle("rot", "vigenerechiffre")
 
+    # senden der html-Seite verschlüsseln mit einem exemplarischen Schlüssel mit Text und zugehöriger verschlüsselung
     return render_template('verschluesseln.html',
                            keytable=encryptreturn[0],
                            encrypttable=encryptreturn[1],
@@ -30,6 +33,7 @@ def verschluesseln():
 
 @bp_vigenere.route('/encrypt', methods=['POST'])
 def verschluesseln_buttonclick():
+    # erfolgt html-Seiten-Eingaben speichern
     texteingabe = request.form.get('cleartext_text').strip()  # strip entfernt Leerzeichen
     schluesseleingabe = request.form.get('key').strip()
     datei = request.files['cleartext_upload']
@@ -83,6 +87,8 @@ def verschluesseln_buttonclick():
     # die html-Seite übergeben
     encryptreturn = encrypt_tabelle(schluesseleingabe, texteingabe)
 
+    # senden der html-Seite mit den erfolgten und angepassten Eingaben
+    # sowie der erhaltenen Returnwerte der genutzten Funktion
     return render_template('verschluesseln.html',
                            keytable=encryptreturn[0],
                            encrypttable=encryptreturn[1],
@@ -97,8 +103,10 @@ def verschluesseln_buttonclick():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/decrypt', methods=['GET'])
 def entschluesseln():
+    #übergebenen String mit dem Schlüssel rot entschlüsseln und das Ergebnis in decrypt_return speichern
     decrypt_return = decrypt_tabelle("rot", "MWZVBXISVYWYWFX")
 
+    # senden der html-Seite mit dem Schlüssel rot, dem verschlüsselten text und dessen Entschlüsselungsergebnis
     return render_template('entschluesseln.html',
                            keytable=decrypt_return[0],
                            decrypttable=decrypt_return[1],
@@ -162,6 +170,7 @@ def entschluesseln_buttonclick():
     # die html-Seite übergeben
     decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
 
+    #senden der html-Seite mit den zuvor erfolgten Eingaben sowie den berechneten Returnwerten
     return render_template('entschluesseln.html',
                            keytable=decrypt_return[0],
                            decrypttable=decrypt_return[1],
@@ -176,6 +185,7 @@ def entschluesseln_buttonclick():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/kasiski', methods=['GET'])
 def kasiski_test():
+    # senden der html-Seite kasiki-test.html
     return render_template('kasiski-test.html')
 
 
@@ -233,6 +243,8 @@ def kasiski_test_buttonclick():
     # Anzahl wie viele n-Gramme gefunden wurden
     anzahl = len(kasiski_return[0])
 
+    # senden der html-Seite mit den erfolgten Eingaben, dem erhaltenen Return des
+    # Funktionsaufrufres und der berechneten Anzahl
     return render_template('kasiski-test.html',
                            ngramme=kasiski_return[0],
                            gcd=kasiski_return[1],
@@ -242,6 +254,7 @@ def kasiski_test_buttonclick():
 
 @bp_vigenere.route('/kasiski_js_send', methods=['GET'])
 def kasiski_js_send():
+    # senden des Javascriptfiles kasiski.js
     return send_file('kasiski.js')
 
 
@@ -250,6 +263,7 @@ def kasiski_js_send():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/koinzidenzindex', methods=['GET'])
 def koinzidenzindex_methode():
+    # senden der html-Seite koinzidenzindex-methode.html
     return render_template('koinzidenzindex-methode.html')
 
 
@@ -320,6 +334,7 @@ def koinzidenzindex_methode_buttonclick():
     # Berechnung der Koinzidenzindexe
     ci_return = coincidence_berechnung(str(texteingabe), int(max_cols), float(threshold))
 
+    # sender der html-Seite mit den erfolgten Eingaben und den berechneten Koinzidenzindexen
     return render_template('koinzidenzindex-methode.html',
                            cols_param=max_cols,
                            threshold_param=float(threshold),
@@ -329,6 +344,7 @@ def koinzidenzindex_methode_buttonclick():
 
 @bp_vigenere.route('/ci_js_send', methods=['GET'])
 def ci_js_send():
+    # senden des Javascriptfiles ki_spaltenaufteilung.js
     return send_file('ki_spaltenaufteilung.js')
 
 
@@ -337,6 +353,7 @@ def ci_js_send():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/gegenseitigerKoinzidenzindex', methods=['GET'])
 def gki_methode():
+    # senden der html-Seite schluesselberechnung.html
     return render_template('schluesselberechnung.html')
 
 
@@ -430,16 +447,17 @@ def gki_methode_buttonclick():
 
 @bp_vigenere.route('/schluessel_js_send', methods=['GET'])
 def schluessel_js_send():
+    # senden des Javascriptfiles schlussel.js
     return send_file('schluessel.js')
 
 
 @bp_vigenere.route('/matplotimage', methods=['GET'])
 def matplotimage():
-    # test = request.args
+    # Inhalt aus der Url in den Variabeln abspeichern
     text1 = request.args.get("text1")
     text2 = request.args.get("text2")
     shift = request.args.get("shift")
 
+    # Diagramm mithilfe der Variablen erzeugen und dieses an die html-Datei senden
     diagram = create_diagram(text1, text2, int(shift))
-
     return send_file(diagram)

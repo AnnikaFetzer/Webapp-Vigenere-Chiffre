@@ -1,11 +1,12 @@
 
 
 function onChangeTextaufteilung(eintragString) {
-     let eintrag = JSON.parse(eintragString)
-     let spaltenanzahl = eintrag[0]
-     let spaltentexte = eintrag[1]
-     let koinzidenzindexe = eintrag[2]
+    let eintrag = JSON.parse(eintragString)
+    let spaltenanzahl = eintrag[0]
+    let spaltentexte = eintrag[1]
+    let koinzidenzindexe = eintrag[2]
 
+    // Element mit id ci_berechnung in ausgabe_table speicher
     let ausgabe_table = document.getElementById("ci_berechnung")
     let html_code = ""
 
@@ -14,7 +15,6 @@ function onChangeTextaufteilung(eintragString) {
     html_code += "<th colspan="+ spaltentexte[0].length +">Text</th></tr>"
 
     for(i=0; i<spaltenanzahl; i++){
-
         // Einfügen der Spaltennummer und des gerundeten Koinzidenzindexes am Zeilenanfang
         html_code += "<tr><th class='mx-auto text-center'>" + (i+1) + "</th><td>"
         html_code += (Math.round(koinzidenzindexe[i] * 10000)/10000) + "</td>"
@@ -28,5 +28,6 @@ function onChangeTextaufteilung(eintragString) {
         html_code += "</tr>"
     }
 
+    // in String html_code erzeugten und gespeicherten html-Code in das Element des html-Files übergeben
     ausgabe_table.innerHTML = html_code
 }
