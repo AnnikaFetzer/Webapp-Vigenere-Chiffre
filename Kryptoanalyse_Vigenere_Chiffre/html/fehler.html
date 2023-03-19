@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Es ist ein Fehler aufgetreten</h1>
+<hr class="pb-3 mb-5">
+
+<div class="alert alert-danger" role="alert">
+    {{ error_name }}
+    <br><br>
+    {{ error_description }}
+</div>
+
+{% endblock %}

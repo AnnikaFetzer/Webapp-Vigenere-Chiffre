@@ -227,12 +227,11 @@
 <div class="mb-3 row">
     <label class="col-sm-2 col-form-label">Schlüssel:</label>
     <div class="col-sm-3">
-        <select class="form-select" name="keys">
+        <select class="form-select" name="keys" onchange="if (typeof(this.selectedIndex) != 'undefined') onClickSchluessel(this.value)">
             <option label=""></option>
             {% for item in matrix %}
             {% if item[1] == True %}
-            <option label="k{{item[2]}}" onclick="onClickSchluessel({{item[2]}}, {{schluessel}})">k{{item[2]}}
-            </option>
+            <option id="opt_1" label="k{{item[2]}}" value='{"k": {{item[2]}}, "schluessel": {{schluessel|to_json}}}'>k{{item[2]}}</option>
             {% endif %}
             {% endfor %}
         </select>

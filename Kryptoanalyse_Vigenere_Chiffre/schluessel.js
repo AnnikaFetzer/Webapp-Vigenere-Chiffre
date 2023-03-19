@@ -1,5 +1,8 @@
 
-function onClickSchluessel(k, schluessel){
+function onClickSchluessel(eintragString){
+    let eintrag = JSON.parse(eintragString)
+    let schluessel = eintrag['schluessel']
+    let k = eintrag['k']
 
     // die in html enthalte Element mit der id schluessel_berechnung wird in ausgabe_table gespeichert
     let ausgabe_table = document.getElementById("schluessel_berechnung")

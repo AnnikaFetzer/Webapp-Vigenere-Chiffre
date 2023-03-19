@@ -249,11 +249,10 @@ def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
     wird result auf False gesetzt wenn ein Koinzidenzindex kleiner-gleich dem Schwellwert ist.
     """
     c_indexe = []
-    result = True
     for k in range(len(spalten)):
         c_indexe.append(coincidence_index(spalten[k]))
-        if c_indexe[k] <= schwellwert:
-            result = False
+
+    result = all(map(lambda ci: ci >= schwellwert, c_indexe))
 
     return len(spalten), spalten, c_indexe, result
 
