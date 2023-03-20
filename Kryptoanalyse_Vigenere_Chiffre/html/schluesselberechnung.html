@@ -231,7 +231,7 @@
             <option label=""></option>
             {% for item in matrix %}
             {% if item[1] == True %}
-            <option id="opt_1" label="k{{item[2]}}" value='{"k": {{item[2]}}, "schluessel": {{schluessel|to_json}}}'>k{{item[2]}}</option>
+            <option id="opt_1" label="k{{item[2]}}" value='{"k": {{item[2]}}, "schluessel": {{schluessel|tojson}}}'>k{{item[2]}}</option>
             {% endif %}
             {% endfor %}
         </select>
