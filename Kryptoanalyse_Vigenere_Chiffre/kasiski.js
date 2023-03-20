@@ -1,14 +1,20 @@
 
 function onChangeNgramm(eintragString) {
-    let eintrag = JSON.parse(eintragString)
-    let ngram = eintrag[0]
-    let idxs = eintrag[1]
-    let gcd = eintrag[2]
-
     // Elemente aus html holen und speichern
     let text = document.getElementById('cipher_text').value
     let ausgabe_text = document.getElementById('ausgabe_text_farbig')
     let ausgabe_pos = document.getElementById('ausgabe_positionen')
+
+    if (eintragString == "") {
+        ausgabe_text.innerHTML = htmlCode = ""
+        ausgabe_pos.innerHTML = htmlCode = ""
+        return
+    }
+
+    let eintrag = JSON.parse(eintragString)
+    let ngram = eintrag[0]
+    let idxs = eintrag[1]
+    let gcd = eintrag[2]
 
     let ausgabe_text_html = ''
     let ausgabe_positionen_html = ''

@@ -39,4 +39,4 @@ def handle_exception(e):
 
 
 # localer Server auf port 80 starten
-webapp.run(host='localhost', port=8080)
+webapp.run(host='localhost', port=80)

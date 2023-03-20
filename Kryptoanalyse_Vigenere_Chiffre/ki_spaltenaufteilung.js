@@ -1,14 +1,19 @@
 
 
 function onChangeTextaufteilung(eintragString) {
+    // Element mit id ci_berechnung in ausgabe_table speicher
+    let ausgabe_table = document.getElementById("ci_berechnung")
+    let html_code = ""
+
+    if (eintragString == "") {
+        ausgabe_table.innerHTML = htmlCode = ""
+        return
+    }
+
     let eintrag = JSON.parse(eintragString)
     let spaltenanzahl = eintrag[0]
     let spaltentexte = eintrag[1]
     let koinzidenzindexe = eintrag[2]
-
-    // Element mit id ci_berechnung in ausgabe_table speicher
-    let ausgabe_table = document.getElementById("ci_berechnung")
-    let html_code = ""
 
     // Befüllen der 1. Zeile mit Beschriftungen Spalte, Koinzidenzindex und Text
     html_code = "<tr><th class='mx-auto text-center'>Spalte</th><th class='mx-auto text-center'>Koinzidenzindex</th>"

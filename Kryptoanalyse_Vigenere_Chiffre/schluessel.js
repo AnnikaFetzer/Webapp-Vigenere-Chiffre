@@ -1,11 +1,16 @@
 
 function onClickSchluessel(eintragString){
+    // die in html enthalte Element mit der id schluessel_berechnung wird in ausgabe_table gespeichert
+    let ausgabe_table = document.getElementById("schluessel_berechnung")
+
+    if (eintragString == "") {
+        ausgabe_table.innerHTML = htmlCode = ""
+        return
+    }
+
     let eintrag = JSON.parse(eintragString)
     let schluessel = eintrag['schluessel']
     let k = eintrag['k']
-
-    // die in html enthalte Element mit der id schluessel_berechnung wird in ausgabe_table gespeichert
-    let ausgabe_table = document.getElementById("schluessel_berechnung")
 
     // in den String htmlCode wird der für die Ausgabe der ersten Tabellenzeile benötigte html-Code gespeichert
     htmlCode = "<tr><th>k" + k + "</th>" + "<th>Schlüssel</th>" + "<th>Anfangstück des Klartexts</th></tr>"
@@ -23,7 +28,7 @@ function onClickSchluessel(eintragString){
     for(n=0;n<26;n++){
         htmlCode += "<tr><td>" + schluessel[index][1][n][0] + "</td>"
         htmlCode += "<td>" + schluessel[index][1][n][1] + "</td>"
-        htmlCode += "<td>" + schluessel[index][1][n][2] + "..." + "</td></tr>"
+        htmlCode += "<td>" + schluessel[index][1][n][2][2] + "..." + "</td></tr>"
     }
 
     // erzeugter html-Code in htmlCode an das Element zurückgeben

@@ -91,7 +91,7 @@
 <div class="row mb-4">
     <label for="ngramme" class="col-sm-2 col-form-label">n-gramm:</label>
     <div class="col-sm-3">
-        <select class="form-select" id="ngramme" name="ngramme" onchange="if (typeof(this.selectedIndex) != 'undefined') onChangeNgramm(this.value)">
+        <select class="form-select" id="ngramme" name="ngramme" onchange="onChangeNgramm(this.value)">
             {% for item in ngramme %}
             <option label="{{item[0]}}" value='{{item|tojson}}'>
                 {{item[0]}}

@@ -227,7 +227,7 @@
 <div class="mb-3 row">
     <label class="col-sm-2 col-form-label">Schlüssel:</label>
     <div class="col-sm-3">
-        <select class="form-select" name="keys" onchange="if (typeof(this.selectedIndex) != 'undefined') onClickSchluessel(this.value)">
+        <select class="form-select" name="keys" onchange="onClickSchluessel(this.value)">
             <option label=""></option>
             {% for item in matrix %}
             {% if item[1] == True %}
