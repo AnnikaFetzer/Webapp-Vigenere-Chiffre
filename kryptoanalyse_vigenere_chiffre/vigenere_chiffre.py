@@ -18,26 +18,23 @@ def encrypt_tabelle(key, cleartext):
 
     # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
     # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
-    for i in range(len(key)):
-        zahl = ord(key[i]) - 97
-        key_list.append([key[i], zahl])
+    for _, value in enumerate(key):
+        zahl = ord(value) - 97
+        key_list.append([value, zahl])
 
     # Iteration über die Cleartextindexe
-    for index in range(len(cleartext)):
-
+    for _, value in enumerate(cleartext):
         # Umwandlung des Buchstabens in eine Zahl
-        zeichen = ord(cleartext[index]) - 97
+        zeichen = ord(value) - 97
 
-        """
-        Hier wird das betrachtete Zeichen des Klartextet mit dem Schlüsselzeichenwert, welcher sich in dem gespeicherten
-        Indexwert in key befindet, durch Addition der beiden Buchstabenwerte berechnet. Zudem werden der verwendetet
-        Schlüsselzeichenwert, der Klartextbuchstabe (als Zichen und Zahl) und der verschlüsselte Buchstabe
-        (ebenfalls als Zeichen und Zahl) in der Verschlüsselungsliste encrypt_list hinzugefügt
-        """
+        # Hier wird das betrachtete Zeichen des Klartextet mit dem Schlüsselzeichenwert, welcher sich in dem
+        # gespeicherten Indexwert in key befindet, durch Addition der beiden Buchstabenwerte berechnet. Zudem werden
+        # der verwendetet Schlüsselzeichenwert, der Klartextbuchstabe (als Zichen und Zahl) und der verschlüsselte
+        # Buchstabe (ebenfalls als Zeichen und Zahl) in der Verschlüsselungsliste encrypt_list hinzugefügt
         keynumber = key_list[keystand][1]
         encryptnummer = (zeichen + keynumber) % 26
         encryptzeichen = chr(encryptnummer + 65)
-        encrypt_list.append([cleartext[index], zeichen, keynumber, encryptnummer, encryptzeichen])
+        encrypt_list.append([value, zeichen, keynumber, encryptnummer, encryptzeichen])
 
         # keystand auf den nächsten Indexwert setzen und hinzufügen des verschlüsselten Buchstabens in ciphertext
         keystand += 1
@@ -60,22 +57,21 @@ def decrypt_tabelle(key, ciphertext):
     :return: key_list, decrypt_list, cleartext
     """
 
-    decrypt_list = []       # Liste für die Veranschaulichung der Entschlüsselung
-    key_list = []           # Liste für die Veranschaulichung des Schlüssels
-    keystand = 0            # speichert einen Index von key
-    cleartext = ""          # enthält den entschlüsselten Text
+    decrypt_list = []  # Liste für die Veranschaulichung der Entschlüsselung
+    key_list = []  # Liste für die Veranschaulichung des Schlüssels
+    keystand = 0  # speichert einen Index von key
+    cleartext = ""  # enthält den entschlüsselten Text
 
     # Iteration über die Schlüssellänge. Dabei werden die Buchstaben des Schlüssels mit deren
     # zur Entschlüsselung benötigten und hier berechneten Zahlenwert der Liste key_list hinzugefügt
-    for i in range(len(key)):
-        zahl = ord(key[i]) - 97
-        key_list.append([key[i], zahl])
+    for _, value in enumerate(key):
+        zahl = ord(value) - 97
+        key_list.append([value, zahl])
 
     # Iteration über den bereinigten ciphertext
-    for index in range(len(ciphertext)):
-
+    for _, value in enumerate(ciphertext):
         # Umwandlung des betrachteten Buchstabens in eine Zahl (zwischen 0 und 25)
-        zeichen = ord(ciphertext[index]) - 65
+        zeichen = ord(value) - 65
 
         # enthält den zur Entschlüsselung nötigen Schlüsselbuchstabenwert
         keynumber = key_list[keystand][1]
@@ -88,7 +84,7 @@ def decrypt_tabelle(key, ciphertext):
 
         # Hinzufügen des Cipherbuchstabens mit dessen Zahlenwert, den verwendeten Schlüsselbuchstabenwert
         # und den entschlüsselten Buchstaben (Zahl und Buchstabe) in decrypt_list
-        decrypt_list.append([ciphertext[index], zeichen, keynumber, decryptnummer, decryptzeichen])
+        decrypt_list.append([value, zeichen, keynumber, decryptnummer, decryptzeichen])
 
         # keystand auf den nächsten Indexwert setzen und hinzufügen des entschlüsselten Buchstabens in cleartext
         keystand += 1
@@ -115,65 +111,57 @@ def kasiski(ciphertext: str, ngramm_laenge: int):
     """
 
     # Dictionary, welche die n-gramme enthält
-    ngramme = dict()
+    ngramme = {}
 
-    """
-    Iteration über ciphertext.
-    Dabei werden alle vorkommenden n-gramme als key in dem Dictionary n-gramme gespeichert.
-    Als Value zu den gespeicherten n-grammen werden die Abstände zum Textbeginn der jeweiligen Vorkommen gespeichert.
-    """
-    for n in range(len(ciphertext)-(ngramm_laenge - 1)):
-
-        substring = ciphertext[n: n + ngramm_laenge]
+    # Iteration über ciphertext.
+    # Dabei werden alle vorkommenden n-gramme als key in dem Dictionary n-gramme gespeichert.
+    # Als Value zu den gespeicherten n-grammen werden die Abstände zum Textbeginn der jeweiligen Vorkommen gespeichert.
+    for text_pos in range(len(ciphertext) - (ngramm_laenge - 1)):
+        substring = ciphertext[text_pos: text_pos + ngramm_laenge]
 
         # wenn betrachteter substring schon vorgekommen ist:
-        if substring in ngramme.keys():
-            ngramme[substring].append(n)
+        if substring in ngramme:
+            ngramme[substring].append(text_pos)
 
         # ansonsten wird er neu hinzugefügt
         else:
-            ngramme[substring] = [n]
+            ngramme[substring] = [text_pos]
 
-    """
-    Berechnen des größten gemeinsamen Teilers (gcd/ggT) anhand der Abstände zum ersten Vorkommen 
-    für alle n-gramme, welche mindestens 3 mal vorkommen.
-    Zudem werden in dem neuen Dictionary relevante_ng alle n-gramme, welche mindestens dreimal vorkommen
-    mit deren Position im Text und dem berechneten gcd gespeichert
-    """
-    gcds = dict()
+    # Berechnen des größten gemeinsamen Teilers (gcd/ggT) anhand der Abstände zum ersten Vorkommen
+    # für alle n-gramme, welche mindestens 3 mal vorkommen.
+    # Zudem werden in dem neuen Dictionary relevante_ng alle n-gramme, welche mindestens dreimal vorkommen
+    # mit deren Position im Text und dem berechneten gcd gespeichert
+    gcds = {}
     relevante_ng = []
     for key, value in ngramme.items():
         if len(value) > 2:
 
             abstaende = []
-            for m in range(len(value) - 1):
-                abstaende.append(value[m+1] - value[0])
+            for pos_ngramm in range(len(value) - 1):
+                abstaende.append(value[pos_ngramm + 1] - value[0])
 
             ggt = gcd_berechnung(abstaende)
             relevante_ng.append([key, ngramme[key], ggt])
 
-            """
-            Hinzufügen des berechneten ggT's in das Dictionary gcds 
-            für die spätere Ermittlung, welcher gcd am häufigsten vorkommt.
-            """
-            if ggt in gcds.keys():
+            # Hinzufügen des berechneten ggT's in das Dictionary gcds
+            # für die spätere Ermittlung, welcher gcd am häufigsten vorkommt.
+            if ggt in gcds:
                 gcds[ggt] = gcds[ggt] + 1
             else:
                 gcds[ggt] = 1
 
-    """
-    Ermitteln, welcher gcd am häufigsten vorkommt.
-    """
-    h_gcd = -1   # enthält den häufigsten gcd
-    a_gcd = 0   # enthält die Anzahl wie odt der häufigste gcd vorkommt
-    for key in gcds:
-        if gcds[key] > a_gcd:
+    # Ermitteln, welcher gcd am häufigsten vorkommt.
+    h_gcd = -1  # enthält den häufigsten gcd
+    a_gcd = 0  # enthält die Anzahl wie odt der häufigste gcd vorkommt
+    for key, value in gcds.items():
+        if value > a_gcd:
             h_gcd = key
-            a_gcd = gcds[key]
+            a_gcd = value
 
     return relevante_ng, h_gcd
 
 
+# pylint: disable=invalid-name
 def gcd_berechnung(abstaende):
     """
     Berechnet den größten gemeinsamen Teiler von zwei oder mehrerer Zahlen
@@ -188,6 +176,7 @@ def gcd_berechnung(abstaende):
     return r
 
 
+# pylint: disable=invalid-name
 def gcd(a, b):
     """
     Bekommt zwei Zahlen übergeben für welche der größte gemeinsame Teiler berechnet und zurückgegeben wird.
@@ -218,7 +207,7 @@ def coincidence_index(text):
     c_index = 0
     for i in range(26):
         anzahl = text.count(chr(i + 65))
-        c_index = c_index + anzahl * (anzahl-1)
+        c_index = c_index + anzahl * (anzahl - 1)
     c_index = c_index / (len(text) * (len(text) - 1))
 
     return c_index
@@ -243,14 +232,12 @@ def coincidence_test(ciphertext: str, spaltenanzahl: int, schwellwert: float):
     else:
         spalten = textaufteilung(ciphertext, spaltenanzahl)
 
-    """
-    Berechnung der Koinzidenzindexe der entstandenen Texte in spalten.
-    Da zudem überprüft wird, ob alle berechneten Indexe der Spaltentexte über dem gegebenen Schwellwert liegen,
-    wird result auf False gesetzt wenn ein Koinzidenzindex kleiner-gleich dem Schwellwert ist.
-    """
+    # Berechnung der Koinzidenzindexe der entstandenen Texte in Spalten.
+    # Da zudem überprüft wird, ob alle berechneten Indexe der Spaltentexte über dem gegebenen Schwellwert liegen,
+    # wird result auf False gesetzt, wenn ein Koinzidenzindex kleiner-gleich dem Schwellwert ist.
     c_indexe = []
-    for k in range(len(spalten)):
-        c_indexe.append(coincidence_index(spalten[k]))
+    for _, value in enumerate(spalten):
+        c_indexe.append(coincidence_index(value))
 
     result = all(map(lambda ci: ci >= schwellwert, c_indexe))
 
@@ -271,7 +258,7 @@ def coincidence_berechnung(ciphertext: str, max_spalten: int, schwellwert: float
     k_indizes = []
 
     for i in range(max_spalten):
-        k_indizes.append(coincidence_test(ciphertext, i+1, schwellwert))
+        k_indizes.append(coincidence_test(ciphertext, i + 1, schwellwert))
 
     return k_indizes
 
@@ -288,32 +275,33 @@ def mutual_coincidence_index(text_x: str, text_y: str):
     :return: alle berechneten gegenseitige Koinzidenzindexe sowie der größte berechnete MIc mit dessen Verschiebung
     """
 
-    mics = []       # Liste mit den berechneten gegenseitigen Koinzidenzindexen und deren verwendeter Verschiebung
-    max_mic = -1    # größter berechneter gegenseitiger Koinzidenzindex
-    g_maxmic = -1   # die zur Berechnung von max_mic verwendete Verschiebung für text_y
+    mics = []  # Liste mit den berechneten gegenseitigen Koinzidenzindexen und deren verwendeter Verschiebung
+    max_mic = -1  # größter berechneter gegenseitiger Koinzidenzindex
+    g_maxmic = -1  # die zur Berechnung von max_mic verwendete Verschiebung für text_y
 
-    # Berechnung aller MIc's mit allen um g verschobenen Varianten von text_y
-    for g in range(26):
+    # Berechnung aller MIc's mit allen um shift_g verschobenen Varianten von text_y
+    for shift_g in range(26):
 
-        # Berechnen des gegenseitigen Koinzidenzindexes der beiden gegebenen Texte mit der Verschiebung g
+        # Berechnen des gegenseitigen Koinzidenzindexes der beiden gegebenen Texte mit der Verschiebung shift_g
         mic = 0
-        for i in range(26):
-            ig = (i - g) % 26
-            mic = mic + text_x.count(chr(i + 65)) * text_y.count(chr(ig + 65))
+        for buchstabe in range(26):
+            ig = (buchstabe - shift_g) % 26
+            mic = mic + text_x.count(chr(buchstabe + 65)) * text_y.count(chr(ig + 65))
         mic = mic / (len(text_x) * len(text_y))
 
-        # Anfügen des berechneten MIc mit der verwendeten Verschiebung g in mics
-        mics.append([g, mic])
+        # Anfügen des berechneten MIc mit der verwendeten Verschiebung shift_g in mics
+        mics.append([shift_g, mic])
 
         # Ermittlung, ob der aktuelle MIc der bisher Maximale ist.
-        # Wenn ja, wird dieser mit zugehörigen g gespeichert.
+        # Wenn ja, wird dieser mit zugehörigen shift_g gespeichert.
         if mic > max_mic:
             max_mic = mic
-            g_maxmic = g
+            g_maxmic = shift_g
 
     return mics, max_mic, g_maxmic
 
 
+# pylint: disable=too-many-locals
 def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
     """
     schluesselberechnung berechnet zunächst für alle unterschiedlichen Texktkombinationen den gegenseitigen
@@ -345,26 +333,23 @@ def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
             # sind i und j unterschiedlich werden die gegenseitige Koinzidenzindexe mit allen Verschiebungen berechnet
             else:
                 mci = mutual_coincidence_index(texte[i], texte[j])
-                """
-                ist der höchste MIc größer gleich wie der gegebene Schwellwert 
-                wird die Matrix mit der Verschiebung befüllt
-                """
+                # ist der höchste MIc größer gleich wie der gegebene Schwellwert
+                # wird die Matrix mit der Verschiebung befüllt
                 if mci[1] >= schwellwert:
                     zeile.append(mci[2])
                 # ist der MIc kleiner als der Schwellwert wird in die Matrix eine -1 eingetragen
                 else:
                     zeile.append(-1)
-                    """ 
-                    Aus einer Zeile der Matrix kann nur der Schlüssel ermittelt werden wenn keine -1 darin vorkommt.
-                    Da dies an dieser Stelle aber der Fall ist, wird gueltiger_key auf False gesetzt.
-                    """
+
+                    # Aus einer Zeile der Matrix kann nur der Schlüssel ermittelt werden, wenn keine -1 darin vorkommt.
+                    # Da dies an dieser Stelle aber der Fall ist, wird gueltiger_key auf False gesetzt.
                     gueltiger_key = False
 
-                alle_mcis.append([i+1, j+1, mci[0], mci[1], mci[2]])
-        matrix.append([zeile, gueltiger_key, j+1])
+                alle_mcis.append([i + 1, j + 1, mci[0], mci[1], mci[2]])
+        matrix.append([zeile, gueltiger_key, j + 1])
 
     # Schlüsselberechnung anhand der in matrix enthaltenden Werte
-    schluessel = []     # Liste, welche alle 26 möglichen Schlüssel mit dem entschlüsselten Textanfang enthält
+    schluessel = []  # Liste, welche alle 26 möglichen Schlüssel mit dem entschlüsselten Textanfang enthält
     for reihe in range(cols):
         # Wenn die aktuelle Zeile keine -1 enthält und somit der mögliche Schlüssel ermittelbar ist
         if matrix[reihe][1] is True:
@@ -379,7 +364,7 @@ def schluesselberechnung(texteingabe, texte, cols: int, schwellwert: float):
                 cleartext = decrypt_tabelle(key, texteingabe[0:42])
 
                 keys.append([chr(k + 97), key, cleartext])
-            schluessel.append([reihe+1, keys])
+            schluessel.append([reihe + 1, keys])
 
     return alle_mcis, matrix, schluessel
 

@@ -121,7 +121,8 @@
 
 <!-- Ausgabe der Grafik, welche in zugehörigem Blueprint erzeugt wird-->
 <div class="text-center">
-    <img class="img-fluid" id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0" alt="Matplot Image">
+    <img class="img-fluid" id="diagrammbild" src="{{url_for('bp_vigenere.matplotimage')}}?text1=0&text2=0&shift=0"
+         alt="Matplot Image">
 </div>
 
 <div id="grafikwerte" style="word-wrap: break-word;">
@@ -231,7 +232,9 @@
             <option label=""></option>
             {% for item in matrix %}
             {% if item[1] == True %}
-            <option id="opt_1" label="k{{item[2]}}" value='{"k": {{item[2]}}, "schluessel": {{schluessel|tojson}}}'>k{{item[2]}}</option>
+            <option id="opt_1" label="k{{item[2]}}" value='{"k": {{item[2]}}, "schluessel": {{schluessel|tojson}}}'>
+                k{{item[2]}}
+            </option>
             {% endif %}
             {% endfor %}
         </select>

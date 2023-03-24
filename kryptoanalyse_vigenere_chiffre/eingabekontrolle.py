@@ -1,5 +1,4 @@
 import re
-from typing import Union
 
 
 def textanpassung_upper(text):
@@ -12,9 +11,10 @@ def textanpassung_upper(text):
     """
     text = text.upper()
     newtext = ""
-    for i in range(len(text)):
-        if 65 <= ord(text[i]) <= 90:
-            newtext += text[i]
+
+    for _, value in enumerate(text):
+        if 65 <= ord(value) <= 90:
+            newtext += value
 
     return newtext
 
@@ -29,9 +29,10 @@ def textanpassung_lower(text):
         """
     text = text.lower()
     newtext = ""
-    for i in range(len(text)):
-        if 97 <= ord(text[i]) <= 122:
-            newtext += text[i]
+
+    for _, value in enumerate(text):
+        if 97 <= ord(value) <= 122:
+            newtext += value
 
     return newtext
 
@@ -49,11 +50,9 @@ def zahleneingabe(eingabezahl, kommazahl: bool):
         if re.match(r"^-?[0-9]+(\.[0-9]+)?$", eingabezahl) is not None:
             p_zahl = abs(float(eingabezahl))
             return p_zahl
-        else:
-            return -1
-    else:
-        if re.match(r"^-?[0-9]+$", eingabezahl):
-            p_gzahl = abs(int(eingabezahl))
-            return p_gzahl
-        else:
-            return -1
+        return -1
+
+    if re.match(r"^-?[0-9]+$", eingabezahl):
+        p_gzahl = abs(int(eingabezahl))
+        return p_gzahl
+    return -1

@@ -1,9 +1,9 @@
+import os
 
 from flask import Flask, send_file, render_template
 from werkzeug.exceptions import HTTPException
 
 from blueprints import bp_vigenere
-
 
 webapp = Flask("Kryptoanalyse der Vigenere Chiffre")
 webapp.config['SECRET_KEY'] = 'geheimer Schluessel'
@@ -19,17 +19,17 @@ def hauptseite():
 
 @webapp.route('/hs-aalen.svg', methods=['GET'])
 def hs_logo():
-    return send_file('hs-aalen.svg', as_attachment=True)
+    return send_file(os.path.join(os.path.dirname(os.path.relpath(__file__)), 'hs-aalen.svg'), as_attachment=True)
 
 
 @webapp.errorhandler(Exception)
-def handle_exception(e):
+def handle_exception(exception):
     # pass through HTTP errors
-    if isinstance(e, HTTPException):
+    if isinstance(exception, HTTPException):
         # HTTP Fehlercodes an Nutzer weiterleiten
         return render_template('fehler.html',
-                               error_name=e.name,
-                               error_description=e.description)
+                               error_name=exception.name,
+                               error_description=exception.description)
 
     # es ist ein Fehler im code aufgetreten -> diesen vor dem Nutzer verbergen
     return render_template('fehler.html',

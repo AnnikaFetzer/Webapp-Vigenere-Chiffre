@@ -1,9 +1,11 @@
+import os
+
 from eingabekontrolle import textanpassung_lower, textanpassung_upper, zahleneingabe
 from vigenere_chiffre import encrypt_tabelle, decrypt_tabelle, kasiski, coincidence_berechnung
 from vigenere_chiffre import textaufteilung, schluesselberechnung
 from grafik import create_diagram
 
-from flask import Blueprint, url_for, redirect, request, render_template, send_file, flash
+from flask import Blueprint, request, render_template, send_file, flash
 
 # Blueprint definieren
 bp_vigenere = Blueprint('bp_vigenere', __name__, template_folder='html', url_prefix='/Vigenere')
@@ -39,11 +41,9 @@ def verschluesseln_buttonclick():
     datei = request.files['cleartext_upload']
     fehlereingabe = False
 
-    '''
-        Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
-        Kommt es zu diesem Fehler wird die Verschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
-        und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
-        '''
+    # Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    # Kommt es zu diesem Fehler wird die Verschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
+    # und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
     try:
         inhalt = datei.read().decode('utf-8')
     except UnicodeDecodeError:
@@ -103,7 +103,7 @@ def verschluesseln_buttonclick():
 # ----------------------------------------------------------------------------------------------------------------------
 @bp_vigenere.route('/decrypt', methods=['GET'])
 def entschluesseln():
-    #übergebenen String mit dem Schlüssel rot entschlüsseln und das Ergebnis in decrypt_return speichern
+    # übergebenen String mit dem Schlüssel rot entschlüsseln und das Ergebnis in decrypt_return speichern
     decrypt_return = decrypt_tabelle("rot", "MWZVBXISVYWYWFX")
 
     # senden der html-Seite mit dem Schlüssel rot, dem verschlüsselten text und dessen Entschlüsselungsergebnis
@@ -122,11 +122,9 @@ def entschluesseln_buttonclick():
     datei = request.files['ciphertext_upload']
     fehlereingabe = False
 
-    '''
-    Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
-    Kommt es zu diesem Fehler wird die Entschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
-    und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
-    '''
+    # Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    # Kommt es zu diesem Fehler wird die Entschlüsselung an dieser Stelle abgebrochen und somit nicht ausgeführt
+    # und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
     try:
         inhalt = datei.read().decode('utf-8')
     except UnicodeDecodeError:
@@ -170,7 +168,7 @@ def entschluesseln_buttonclick():
     # die html-Seite übergeben
     decrypt_return = decrypt_tabelle(schluesseleingabe, texteingabe)
 
-    #senden der html-Seite mit den zuvor erfolgten Eingaben sowie den berechneten Returnwerten
+    # senden der html-Seite mit den zuvor erfolgten Eingaben sowie den berechneten Returnwerten
     return render_template('entschluesseln.html',
                            keytable=decrypt_return[0],
                            decrypttable=decrypt_return[1],
@@ -198,11 +196,9 @@ def kasiski_test_buttonclick():
 
     fehlereingabe = False
 
-    '''
-        Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
-        Kommt es zu diesem Fehler wird die n-gramm-Suche an dieser Stelle abgebrochen und somit nicht ausgeführt
-        und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
-        '''
+    # Abfangen von Fällen wo das lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    # Kommt es zu diesem Fehler wird die n-gramm-Suche an dieser Stelle abgebrochen und somit nicht ausgeführt
+    # und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
     try:
         dateiinhalt = datei.read().decode('utf-8')
     except UnicodeDecodeError:
@@ -255,7 +251,7 @@ def kasiski_test_buttonclick():
 @bp_vigenere.route('/kasiski_js_send', methods=['GET'])
 def kasiski_js_send():
     # senden des Javascriptfiles kasiski.js
-    return send_file('kasiski.js')
+    return send_file(os.path.join(os.path.dirname(os.path.relpath(__file__)), 'kasiski.js'))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -277,11 +273,9 @@ def koinzidenzindex_methode_buttonclick():
 
     fehlereingabe = False
 
-    '''
-    Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
-    Kommt es zu diesem Fehler wird die Koinzidenindexberechnung an dieser Stelle abgebrochen
-    und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
-    '''
+    # Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    # Kommt es zu diesem Fehler wird die Koinzidenindexberechnung an dieser Stelle abgebrochen
+    # und eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
     try:
         dateiinhalt = datei.read().decode('utf-8')
     except UnicodeDecodeError:
@@ -345,7 +339,7 @@ def koinzidenzindex_methode_buttonclick():
 @bp_vigenere.route('/ci_js_send', methods=['GET'])
 def ci_js_send():
     # senden des Javascriptfiles ki_spaltenaufteilung.js
-    return send_file('ki_spaltenaufteilung.js')
+    return send_file(os.path.join(os.path.dirname(os.path.relpath(__file__)), 'ki_spaltenaufteilung.js'))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -367,11 +361,9 @@ def gki_methode_buttonclick():
 
     fehlereingabe = False
 
-    '''
-    Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
-    Kommt es zu diesem Fehler wird die Schlüsselberechnung an dieser Stelle abgebrochen 
-    und stattdessen eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
-    '''
+    # Abfangen von Fällen wo das Lesen des Dateiinhaltes einem UnicodeDecodeError führt.
+    # Kommt es zu diesem Fehler wird die Schlüsselberechnung an dieser Stelle abgebrochen
+    # und stattdessen eine Nachricht für den Nutzer definiert, welche dann auf der html-Seite ausgegeben werden soll.
     try:
         dateiinhalt = datei.read().decode('utf-8')
     except UnicodeDecodeError:
@@ -448,7 +440,7 @@ def gki_methode_buttonclick():
 @bp_vigenere.route('/schluessel_js_send', methods=['GET'])
 def schluessel_js_send():
     # senden des Javascriptfiles schlussel.js
-    return send_file('schluessel.js')
+    return send_file(os.path.join(os.path.dirname(os.path.relpath(__file__)), 'schluessel.js'))
 
 
 @bp_vigenere.route('/matplotimage', methods=['GET'])

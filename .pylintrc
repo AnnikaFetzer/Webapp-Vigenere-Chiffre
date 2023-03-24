@@ -1,0 +1,7 @@
+[tool.pylint.main]
+source-roots = ./Kryptoanalyse_Vigenere_Chiffre
+disable = C0114, C0116
+
+
+[tool.pylint.format]
+max-line-length=120
